@@ -1,0 +1,42 @@
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+* {
+  font-family: 'Public Sans', 'Inter', -apple-system, sans-serif !important;
+}
+
+.ag-theme-alpine, .ag-theme-alpine-dark {
+  --ag-font-family: 'Public Sans', 'Inter', sans-serif;
+  --ag-font-size: 14px;
+}
+
+h1, h2, h3, h4, h5, h6, .MuiTypography-h4 {
+  font-weight: 700 !important;
+  letter-spacing: -0.02em; /* Makes big text look more premium */
+}
+
+.ag-paging-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.ag-paging-row-summary-panel,
+.ag-paging-page-size {
+  margin: 0 !important;
+}
+
+/* Hide page size dropdown on very small screens */
+@media (max-width: 600px) {
+  .ag-paging-page-size {
+    display: none;
+  }
+}
+
+
