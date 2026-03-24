@@ -15,8 +15,9 @@ export default function Dashboard() {
       sx={{
         height: "100vh",
         overflow: "hidden",
-        bgcolor: "#f5f6f8",
-      }}  >
+        bgcolor: "background.default"
+      }}
+    >
       <Header onMenuClick={() => setMobileOpen(true)} />
 
       <Box
@@ -28,11 +29,9 @@ export default function Dashboard() {
           bottom: 0,
           display: "flex",
           overflow: "hidden",
-        }}>
-        <Sidebar
-          mobileOpen={mobileOpen}
-          onClose={() => setMobileOpen(false)}
-        />
+        }}
+      >
+        <Sidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
 
         <Box
           sx={{
@@ -43,42 +42,53 @@ export default function Dashboard() {
             minWidth: 0,
           }}
         >
+          {/* Breadcrumbs bar */}
           <Box
-          sx={{
-            px: 1.5,
-            display: "flex",
-            alignItems: "center",
-            flexShrink: 0,
-            bgcolor: "background.paper",
-            }}>
-                <BreadcrumbsBar />
-            </Box>
+            sx={{
+              px: 2,
+              height: 44,
+              display: "flex",
+              alignItems: "center",
+              flexShrink: 0,
+              bgcolor: "background.paper",
+              borderBottom: (theme) =>
+                `1px solid ${theme.palette.mode === "dark"
+                  ? "rgba(255,255,255,0.08)"
+                  : "rgba(0,0,0,0.06)"
+                }`,
+              boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+            }}
+          >
+            <BreadcrumbsBar />
+          </Box>
+
+          {/* Scrollable content area */}
           <Box
             sx={{
               flexGrow: 1,
               overflowY: "auto",
-              px: 0,
-              py: 0,
-                  "&::-webkit-scrollbar": {
-                    width: "8px",},
-                  "&::-webkit-scrollbar-track": {
-                    background: "transparent",},
-                  "&::-webkit-scrollbar-thumb": {
-                    backgroundColor: "rgba(0,0,0,0.25)",
-                    borderRadius: "8px",
-                    border: "2px solid transparent",
-                    backgroundClip: "content-box",},
-                  "&::-webkit-scrollbar-thumb:hover": {
-                    backgroundColor: "rgba(0,0,0,0.45)",},
-                    scrollbarWidth: "thin",
-                    scrollbarColor: "rgba(0,0,0,0.35) transparent",}}>
+              bgcolor: "#f0f2f7",
+              "&::-webkit-scrollbar": { width: "6px" },
+              "&::-webkit-scrollbar-track": { background: "transparent" },
+              "&::-webkit-scrollbar-thumb": {
+                backgroundColor: "rgba(0,0,0,0.18)",
+                borderRadius: "8px",
+              },
+              "&::-webkit-scrollbar-thumb:hover": {
+                backgroundColor: "rgba(0,0,0,0.3)",
+              },
+              scrollbarWidth: "thin",
+              scrollbarColor: "rgba(0,0,0,0.18) transparent",
+            }}
+          >
             <Box
               sx={{
                 width: "100%",
-                p: 2,
+                px: { xs: 2, sm: 3, md: 4, xl: 6 },
+                py: { xs: 2, sm: 3 },
                 minHeight: "100%",
-                bgcolor: "background.paper",
-              }}>
+              }}
+            >
               <Outlet />
             </Box>
           </Box>

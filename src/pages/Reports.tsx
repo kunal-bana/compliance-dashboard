@@ -6,8 +6,7 @@ import {
   CardContent,
   Stack,
   Chip,
-  useTheme,
-  Alert,
+  alpha,
 } from "@mui/material";
 import { useState, useMemo } from "react";
 import { useSelector } from "react-redux";
@@ -20,6 +19,7 @@ import AutorenewIcon from "@mui/icons-material/Autorenew";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import GavelIcon from "@mui/icons-material/Gavel";
+import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 
 import {
   ResponsiveContainer,
@@ -42,27 +42,36 @@ const statusConfig: any = {
   Pending: {
     color: "warning",
     icon: <AssignmentIcon fontSize="small" />,
-    chartColor: "#f7971e",
+    chartColor: "#f59e0b",
+    gradient: "linear-gradient(135deg, #f7971e, #ffd200)",
+    accent: "#f7971e",
   },
   "In Progress": {
     color: "info",
     icon: <AutorenewIcon fontSize="small" />,
-    chartColor: "#36d1dc",
+    chartColor: "#3b82f6",
+    gradient: "linear-gradient(135deg, #36d1dc, #5b86e5)",
+    accent: "#3b82f6",
   },
   Completed: {
     color: "success",
     icon: <CheckCircleIcon fontSize="small" />,
-    chartColor: "#56ab2f",
+    chartColor: "#10b981",
+    gradient: "linear-gradient(135deg, #56ab2f, #a8e063)",
+    accent: "#10b981",
   },
   Overdue: {
     color: "error",
     icon: <WarningAmberIcon fontSize="small" />,
-    chartColor: "#ff416c",
+    chartColor: "#ef4444",
+    gradient: "linear-gradient(135deg, #ff416c, #ff4b2b)",
+    accent: "#ef4444",
   },
 };
 
 /* ============================
    DATE SAFE HANDLER
+   Fixes: non-serializable Firestore Timestamp in Redux store
 ============================ */
 function normalizeDate(value: any): Date | null {
   if (!value) return null;
@@ -71,22 +80,84 @@ function normalizeDate(value: any): Date | null {
     const d = new Date(value);
     return isNaN(d.getTime()) ? null : d;
   }
+  if (value instanceof Date) return value;
   return null;
+}
+
+/* ============================
+   STAT CARD
+============================ */
+function StatCard({
+  status,
+  count,
+}: {
+  status: string;
+  count: number;
+}) {
+  const config = statusConfig[status];
+  return (
+    <Card
+      elevation={0}
+      sx={{
+        borderRadius: "14px",
+        border: "1px solid rgba(0,0,0,0.07)",
+        boxShadow: "0 2px 16px rgba(0,0,0,0.05)",
+        overflow: "hidden",
+        position: "relative",
+        bgcolor: "background.paper"
+      }}
+    >
+      <Box
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "4px",
+          height: "100%",
+          background: config.gradient,
+        }}
+      />
+      <CardContent sx={{ pl: 3 }}>
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Box>
+            <Typography variant="body2" sx={{ color: "#64748b", fontWeight: 500, mb: 0.5 }}>
+              {status}
+            </Typography>
+            <Typography variant="h3" fontWeight={800} sx={{ color: "text.primary", lineHeight: 1 }}>
+              {count}
+            </Typography>
+          </Box>
+          <Box
+            sx={{
+              width: 44,
+              height: 44,
+              borderRadius: "12px",
+              background: alpha(config.accent, 0.1),
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: config.accent,
+            }}
+          >
+            {config.icon}
+          </Box>
+        </Stack>
+      </CardContent>
+    </Card>
+  );
 }
 
 /* ============================
    COMPONENT
 ============================ */
 export default function Reports() {
-  const theme = useTheme();
   const role = useSelector((state: RootState) => state.auth.role);
   const currentUserId = useSelector((state: RootState) => state.auth.uid);
   const navigate = useNavigate();
   const { data: tasks = [] } = useGetTasksQuery();
   const { data: regulations = [] } = useGetRegulationsQuery();
 
-  const [selectedRegulation, setSelectedRegulation] =
-    useState<string | null>(null);
+  const [selectedRegulation, setSelectedRegulation] = useState<string | null>(null);
 
   /* ============================
      OVERDUE AUTO CALCULATION
@@ -94,27 +165,21 @@ export default function Reports() {
   const enrichedTasks = useMemo(() => {
     return tasks.map((task: any) => {
       const due = normalizeDate(task.dueDate);
-
       if (task.status !== "Completed" && due && due < new Date()) {
         return { ...task, computedStatus: "Overdue" };
       }
-
       return { ...task, computedStatus: task.status };
     });
   }, [tasks]);
-  const handlePieClick = (entry: any) => {
-  if (!entry?.name) return;
 
-  if (entry.name === "Overdue") {
-    navigate("/dashboard/tasks", {
-      state: { overdue: true },
-    });
-  } else {
-    navigate("/dashboard/tasks", {
-      state: { status: entry.name },
-    });
-  }
-};
+  const handlePieClick = (entry: any) => {
+    if (!entry?.name) return;
+    if (entry.name === "Overdue") {
+      navigate("/dashboard/tasks", { state: { overdue: true } });
+    } else {
+      navigate("/dashboard/tasks", { state: { status: entry.name } });
+    }
+  };
 
   /* ============================
      ROLE BASED FILTER
@@ -135,259 +200,218 @@ export default function Reports() {
      STATUS SUMMARY
   ============================ */
   const statusSummary = {
-    Pending: filteredTasks.filter(
-      (t: any) => t.computedStatus === "Pending"
-    ).length,
-    "In Progress": filteredTasks.filter(
-      (t: any) => t.computedStatus === "In Progress"
-    ).length,
-    Completed: filteredTasks.filter(
-      (t: any) => t.computedStatus === "Completed"
-    ).length,
-    Overdue: filteredTasks.filter(
-      (t: any) => t.computedStatus === "Overdue"
-    ).length,
+    Pending: filteredTasks.filter((t: any) => t.computedStatus === "Pending").length,
+    "In Progress": filteredTasks.filter((t: any) => t.computedStatus === "In Progress").length,
+    Completed: filteredTasks.filter((t: any) => t.computedStatus === "Completed").length,
+    Overdue: filteredTasks.filter((t: any) => t.computedStatus === "Overdue").length,
   };
 
   /* ============================
      PIE CHART DATA
   ============================ */
-  const pieData = Object.entries(statusSummary).map(
-    ([status, count]) => ({
-      name: status,
-      value: count,
-      color: statusConfig[status].chartColor,
-    })
-  );
+  const pieData = Object.entries(statusSummary).map(([status, count]) => ({
+    name: status,
+    value: count,
+    color: statusConfig[status].chartColor,
+  }));
 
   /* ============================
      MONTHLY LINE DATA
   ============================ */
   const lineData = useMemo(() => {
-  const monthMap: Record<string, number> = {};
+    const monthMap: Record<string, number> = {};
+    filteredTasks.forEach((task: any) => {
+      const date = normalizeDate(task.createdAt);
+      if (!date) return;
+      const key = `${date.getFullYear()}-${date.getMonth()}`;
+      monthMap[key] = (monthMap[key] || 0) + 1;
+    });
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return Object.entries(monthMap)
+      .sort(([a], [b]) => {
+        const [yA, mA] = a.split("-").map(Number);
+        const [yB, mB] = b.split("-").map(Number);
+        return yA !== yB ? yA - yB : mA - mB;
+      })
+      .map(([key, count]) => ({
+        month: monthNames[Number(key.split("-")[1])],
+        count,
+      }));
+  }, [filteredTasks]);
 
-  filteredTasks.forEach((task: any) => {
-    const date = normalizeDate(task.createdAt);
-    if (!date) return;
-
-    const year = date.getFullYear();
-    const monthIndex = date.getMonth(); // 0–11
-
-    const key = `${year}-${monthIndex}`; // sortable key
-    monthMap[key] = (monthMap[key] || 0) + 1;
-  });
-
-  // Sort chronologically
-  const sortedEntries = Object.entries(monthMap).sort(
-    ([a], [b]) => {
-      const [yearA, monthA] = a.split("-").map(Number);
-      const [yearB, monthB] = b.split("-").map(Number);
-
-      if (yearA !== yearB) return yearA - yearB;
-      return monthA - monthB;
-    }
-  );
-
-  const monthNames = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-  ];
-
-  return sortedEntries.map(([key, count]) => {
-    const [, monthIndex] = key.split("-").map(Number);
-    return {
-      month: monthNames[monthIndex],
-      count,
-    };
-  });
-}, [filteredTasks]);
+  const tooltipStyle = {
+    contentStyle: {
+      borderRadius: "10px",
+      border: "none",
+      boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
+      fontSize: "13px",
+    },
+  };
 
   /* ============================
      RENDER
   ============================ */
   return (
-    <Box sx={{ height: "100%", width: "100%", p: { xs: 1, md: 0 } }}>
-      <Typography variant="h5" fontWeight={700} sx={{ mb: 3 }}>
-        Reports & Analytics
-      </Typography>
+    <Box sx={{ width: "100%" }}>
+      {/* Page Header */}
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h6" fontWeight={600} sx={{ color: "black", letterSpacing: "-0.5px" }}>
+          Reports & Analytics
+        </Typography>
+        <Typography variant="body2" sx={{ color: "#64748b", mt: 0.5 }}>
+          Insights and trends across compliance tasks and regulations.
+        </Typography>
+      </Box>
 
-      {/* ============================
-         STATUS SUMMARY CARDS
-      ============================ */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        {Object.entries(statusSummary).map(([status, count]) => {
-          const config = statusConfig[status];
-
-          return (
-            <Grid size={{ xs: 12, sm: 6, md: 3 }} key={status}>
-              <Card sx={{ borderRadius: 2, boxShadow: 2 }}>
-                <CardContent>
-                  <Stack
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <Stack>
-                      <Typography variant="body2" color="text.secondary">
-                        {status}
-                      </Typography>
-                      <Typography variant="h4" fontWeight={700}>
-                        {count}
-                      </Typography>
-                    </Stack>
-
-                    <Chip
-                      icon={config.icon}
-                      label=""
-                      color={config.color}
-                    />
-                  </Stack>
-                </CardContent>
-              </Card>
-            </Grid>
-          );
-        })}
+      {/* Status Summary Cards */}
+      <Grid container spacing={{ xs: 2, sm: 3 }} sx={{ mb: 5 }}>
+        {Object.entries(statusSummary).map(([status, count]) => (
+          <Grid size={{ xs: 12, sm: 6, md: 3 }} key={status}>
+            <StatCard status={status} count={count} />
+          </Grid>
+        ))}
       </Grid>
-      
-      {/* ============================
-         FILTER INFO
-      ============================ */}
-      <Alert severity="info" sx={{ mb: 3 }}>
-        Tap on a regulation card below to filter tasks by regulation.
-      </Alert>
 
-      {/* ============================
-         REGULATIONS
-      ============================ */}
-      <Typography variant="h6" sx={{ mb: 2 }}>
-        Tasks by Regulation
-      </Typography>
-      {selectedRegulation && (
-        <Box mb={3}>
-          <Chip
-            label="Regulation Filter Active"
-            onDelete={() => setSelectedRegulation(null)}
-            color="primary"
-            variant="outlined"
-          />
+      {/* Regulation Filter Section */}
+      <Box sx={{ mb: 4 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}>
+          <Box sx={{ width: 4, height: 22, borderRadius: "2px", background: "linear-gradient(180deg, #3b82f6, #6366f1)" }} />
+          <Typography variant="h6" fontWeight={700} sx={{ color: "black" }}>
+            Tasks by Regulation
+          </Typography>
+          {selectedRegulation && (
+            <Chip
+              icon={<FilterAltOutlinedIcon fontSize="small" />}
+              label="Filter Active"
+              onDelete={() => setSelectedRegulation(null)}
+              color="primary"
+              size="small"
+              variant="outlined"
+              sx={{ borderRadius: "8px", fontWeight: 500, ml: 1 }}
+            />
+          )}
         </Box>
-      )}
-      <Grid container spacing={3}>
-        {regulations.map((reg: any) => {
-          const count = roleTasks.filter(
-            (t: any) => t.regulationId === reg.id
-          ).length;
 
-          return (
-            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={reg.id}>
-              <Card
-                onClick={() =>
-                  setSelectedRegulation(
-                    selectedRegulation === reg.id ? null : reg.id22
-                  )
-                }
-                sx={{
-                  borderRadius: 2,
-                  cursor: "pointer",
-                  boxShadow:2,
-                  border:
-                    selectedRegulation === reg.id
-                      ? `2px solid ${theme.palette.primary.main}`
-                      : "none",
-                  transition: "0.1s",
-                  "&:hover": { transform: "translateY(-2px)",border:"white solid" }
-                }}
-              >
-                <CardContent>
-                  <Stack spacing={1}>
-                    <Stack direction="row" spacing={1}>
-                      <GavelIcon fontSize="small" />
-                      <Typography fontWeight={600}>
-                        {reg.title}
+        <Typography variant="body2" sx={{ color: "#94a3b8", mb: 2.5, fontSize: "0.82rem" }}>
+          Click a regulation card to filter charts by that regulation.
+        </Typography>
+
+        <Grid container spacing={{ xs: 2, sm: 2.5 }}>
+          {regulations.map((reg: any) => {
+            const count = roleTasks.filter((t: any) => t.regulationId === reg.id).length;
+            const isSelected = selectedRegulation === reg.id;
+
+            return (
+              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={reg.id}>
+                <Card
+                  onClick={() => setSelectedRegulation(isSelected ? null : reg.id)}
+                  elevation={0}
+                  sx={{
+                    borderRadius: "14px",
+                    cursor: "pointer",
+                    border: isSelected
+                      ? "2px solid #6366f1"
+                      : "1px solid rgba(0,0,0,0.07)",
+                    boxShadow: isSelected
+                      ? "0 4px 20px rgba(99,102,241,0.2)"
+                      : "0 2px 12px rgba(0,0,0,0.04)",
+                    transition: "all 0.18s ease",
+                    bgcolor: isSelected ? alpha("#6366f1", 0.03) : "#fff",
+                    "&:hover": {
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 6px 24px rgba(0,0,0,0.1)",
+                    },
+                  }}
+                >
+                  <CardContent sx={{ p: { xs: 2, sm: 2.5 } }}>
+                    <Stack spacing={1.5}>
+                      <Stack direction="row" spacing={1} alignItems="flex-start">
+                        <GavelIcon fontSize="small" sx={{ color: isSelected ? "#6366f1" : "#94a3b8", mt: "2px", flexShrink: 0 }} />
+                        <Typography fontWeight={700} sx={{ color: "black", fontSize: "0.9rem", lineHeight: 1.3 }}>
+                          {reg.title}
+                        </Typography>
+                      </Stack>
+                      <Typography variant="body2" sx={{ color: "#94a3b8", fontSize: "0.8rem" }}>
+                        Code: <strong style={{ color: "#475569" }}>{reg.code}</strong>
                       </Typography>
+                      <Stack direction="row" justifyContent="space-between" alignItems="center">
+                        <Chip
+                          label={`${count} Tasks`}
+                          size="small"
+                          sx={{
+                            borderRadius: "6px",
+                            fontWeight: 600,
+                            fontSize: "0.75rem",
+                            bgcolor: alpha("#6366f1", 0.1),
+                            color: "#6366f1",
+                          }}
+                        />
+                        <Chip
+                          label={reg.status}
+                          size="small"
+                          color={reg.status === "Active" ? "success" : "default"}
+                          sx={{ borderRadius: "6px", fontWeight: 600, fontSize: "0.75rem" }}
+                        />
+                      </Stack>
                     </Stack>
+                  </CardContent>
+                </Card>
+              </Grid>
+            );
+          })}
+        </Grid>
+      </Box>
 
-                    <Typography variant="body2" color="text.secondary">
-                      Code: {reg.code}
-                    </Typography>
+      {/* Charts Section */}
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}>
+        <Box sx={{ width: 4, height: 22, borderRadius: "2px", background: "linear-gradient(180deg, #3b82f6, #6366f1)" }} />
+        <Typography variant="h6" fontWeight={700} sx={{ color: "black" }}>
+          Visual Analytics
+        </Typography>
+      </Box>
 
-                    <Stack
-                      direction="row"
-                      justifyContent="space-between"
-                      mt={2}
-                    >
-                      <Chip
-                        label={`${count} Tasks`}
-                        color="primary"
-                        size="small"
-                      />
-                      <Chip
-                        label={reg.status}
-                        color={
-                          reg.status === "Active"
-                            ? "success"
-                            : "default"
-                        }
-                        size="small"
-                      />
-                    </Stack>
-                  </Stack>
-                </CardContent>
-              </Card>
-            </Grid>
-          );
-        })}
-      </Grid>
-
-      {/* ============================
-         CHARTS SECTION
-      ============================ */}
-      <Grid container spacing={4} sx={{ mt: 4 }}>
+      <Grid container spacing={{ xs: 2, sm: 3 }}>
         {/* LINE CHART */}
         <Grid size={{ xs: 12, md: 6 }}>
-          <Card sx={{ borderRadius: 2, p: 2,boxShadow: 2 }}>
-            <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
+          <Card
+            elevation={0}
+            sx={{
+              borderRadius: "14px",
+              border: "1px solid rgba(0,0,0,0.07)",
+              boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
+              bgcolor: "background.paper",
+              p: { xs: 2.5, sm: 3 },
+            }}
+          >
+            <Typography variant="subtitle1" fontWeight={700} sx={{ color: "text.primary", mb: 2.5 }}>
               Tasks Created (Monthly)
             </Typography>
-
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={lineData}>
-                <defs>
-                <linearGradient id="lineGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#667eea" stopOpacity={0.9} />
-                  <stop offset="100%" stopColor="#667eea" stopOpacity={0.1} />
-                </linearGradient>
-                </defs>
-                <CartesianGrid
-                strokeDasharray="3 3"
-                stroke={theme.palette.divider}
-                opacity={0.3}/>
+            <ResponsiveContainer width="100%" height={280}>
+              <LineChart data={lineData} margin={{ top: 4, right: 16, left: -10, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} strokeOpacity={0.15} />
                 <XAxis
-                dataKey="month"
-                tick={{ fontSize: 13 }}
-                axisLine={false}
-                tickLine={false}/>
+                  dataKey="month"
+                  tick={{ fontSize: 12, fill: "#94a3b8" }}
+                  axisLine={false}
+                  tickLine={false}
+                />
                 <YAxis
-                allowDecimals={false}
-                axisLine={false}
-                tickLine={false}/>
-                <ReTooltip
-                contentStyle={{
-                borderRadius: 6,
-                border: "none",
-                boxShadow: "0px 10px 30px rgba(0,0,0,0.15)",
-              }}/>
-              <Legend />
-              <Line
-              type="monotone"
-              dataKey="count"
-              stroke="#667eea"
-              strokeWidth={3}
-              dot={{ r: 4 }}
-              activeDot={{ r: 6 }}
-              fill="url(#lineGradient)"
-              style={{ outline: "none" }}
-              isAnimationActive/>
+                  allowDecimals={false}
+                  tick={{ fontSize: 12, fill: "#94a3b8" }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <ReTooltip {...tooltipStyle} />
+                <Legend wrapperStyle={{ fontSize: 12 }} />
+                <Line
+                  type="monotone"
+                  dataKey="count"
+                  stroke="#6366f1"
+                  strokeWidth={3}
+                  dot={{ r: 4, fill: "#6366f1", strokeWidth: 2, stroke: "#fff" }}
+                  activeDot={{ r: 6, fill: "#6366f1", strokeWidth: 2, stroke: "#fff" }}
+                  isAnimationActive
+                />
               </LineChart>
             </ResponsiveContainer>
           </Card>
@@ -395,71 +419,46 @@ export default function Reports() {
 
         {/* PIE CHART */}
         <Grid size={{ xs: 12, md: 6 }}>
-          <Card sx={{ borderRadius: 2, p: 2,boxShadow: 2 }}>
-            <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
+          <Card
+            elevation={0}
+            sx={{
+              borderRadius: "14px",
+              border: "1px solid rgba(0,0,0,0.07)",
+              boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
+              bgcolor: "background.paper",
+              p: { xs: 2.5, sm: 3 },
+            }}
+          >
+            <Typography variant="subtitle1" fontWeight={700} sx={{ color: "text.primary", mb: 2.5 }}>
               Task Status Distribution
             </Typography>
-
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={280}>
               <PieChart>
-                <defs>
-                  <linearGradient id="gradPending" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#f7971e" />
-                    <stop offset="100%" stopColor="#ffd200" />
-                  </linearGradient>
-
-                  <linearGradient id="gradProgress" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#36d1dc" />
-                    <stop offset="100%" stopColor="#5b86e5" />
-                  </linearGradient>
-
-                  <linearGradient id="gradCompleted" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#56ab2f" />
-                    <stop offset="100%" stopColor="#a8e063" />
-                  </linearGradient>
-
-                  <linearGradient id="gradOverdue" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#ff416c" />
-                    <stop offset="100%" stopColor="#ff4b2b" />
-                  </linearGradient>
-                </defs>
                 <Pie
-                data={pieData}
-                dataKey="value"
-                nameKey="name"
-                outerRadius={110}
-                paddingAngle={4}
-                stroke="none"
-                style={{ outline: "none",cursor: "pointer" }}
-                isAnimationActive
-                onClick={(data) => handlePieClick(data)}
-                activeShape={{ stroke: "#fff", strokeWidth: 2 }}>
-                  {pieData.map((entry, index) => {
-                    const gradientMap: any = {
-                      Pending: "url(#gradPending)",
-                      "In Progress": "url(#gradProgress)",
-                      Completed: "url(#gradCompleted)",
-                      Overdue: "url(#gradOverdue)",
-                    };
-                  return (
-                  <Cell
-                  key={index}
-                  fill={gradientMap[entry.name]}/>
-                );
-                })}
+                  data={pieData}
+                  dataKey="value"
+                  nameKey="name"
+                  outerRadius={110}
+                  paddingAngle={4}
+                  stroke="none"
+                  style={{ outline: "none", cursor: "pointer" }}
+                  isAnimationActive
+                  onClick={(data) => handlePieClick(data)}
+                  activeShape={{ stroke: "#fff", strokeWidth: 3 } as any}
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell key={index} fill={entry.color} />
+                  ))}
                 </Pie>
-              <Legend
-              verticalAlign="bottom"
-              iconType="circle"
-              wrapperStyle={{ fontSize: 14 }}/>
-              <ReTooltip
-              contentStyle={{
-                borderRadius: 6,
-                border: "none",
-                boxShadow: "0px 10px 30px rgba(0,0,0,0.15)",}}
+                <Legend
+                  verticalAlign="bottom"
+                  iconType="circle"
+                  iconSize={8}
+                  wrapperStyle={{ fontSize: 12, color: "#64748b" }}
                 />
-            </PieChart>
-          </ResponsiveContainer>
+                <ReTooltip {...tooltipStyle} />
+              </PieChart>
+            </ResponsiveContainer>
           </Card>
         </Grid>
       </Grid>

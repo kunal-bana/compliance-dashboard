@@ -96,7 +96,7 @@ const avatarLetter =
                 sx={{ 
                   width: 32, 
                   height: 32, 
-                  bgcolor: "text.primary",
+                  color: "text.primary",
                   fontSize: "0.875rem"
                 }}>
                 {avatarLetter}
