@@ -106,7 +106,7 @@ export default function Login() {
               width: 52,
               height: 52,
               borderRadius: "14px",
-              background: "linear-gradient(135deg, #3b82f6, #6366f1)",
+              bgcolor: "background.paper",
               mb: 2,
               boxShadow: "0 8px 32px rgba(99,102,241,0.4)",
             }}
