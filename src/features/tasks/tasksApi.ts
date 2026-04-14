@@ -13,15 +13,11 @@ import {
 } from "firebase/firestore";
 import { db } from "../../services/firebase";
 
-/* ============================
-   ENUM TYPES
-============================ */
+/* ENUM TYPES */
 export type TaskStatus = "Pending" | "In Progress" | "Completed";
 export type TaskPriority = "Low" | "Medium" | "High";
 
-/* ============================
-   MAIN TASK MODEL (DB)
-============================ */
+/* MAIN TASK MODEL (DB) */
 export interface Task {
   id: string;
   title: string;
@@ -36,9 +32,7 @@ export interface Task {
   createdBy: string;
 }
 
-/* ============================
-   FORM INPUT TYPE
-============================ */
+/* FORM INPUT TYPE */
 export interface CreateTaskInput {
   title: string;
   description?: string;
@@ -51,9 +45,7 @@ export interface CreateTaskInput {
   createdBy: string;
 }
 
-/* ============================
-   API
-============================ */
+/* API */
 export const tasksApi = createApi({
   reducerPath: "tasksApi",
   baseQuery: fakeBaseQuery(),

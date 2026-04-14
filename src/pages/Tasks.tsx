@@ -147,10 +147,10 @@ export default function Tasks() {
               overdue
                 ? "error"
                 : p.value === "Completed"
-                ? "success"
-                : p.value === "In Progress"
-                ? "info"
-                : "warning"
+                  ? "success"
+                  : p.value === "In Progress"
+                    ? "info"
+                    : "warning"
             }
             sx={{ fontWeight: 600, borderRadius: "6px", fontSize: "0.75rem" }}
           />
@@ -364,25 +364,25 @@ export default function Tasks() {
           filterFromState.assignedTo ||
           filterFromState.overdue ||
           filterFromState.active) && (
-          <Box sx={{ mt: 1.5 }}>
-            <Chip
-              label={
-                filterFromState.overdue
-                  ? "Filter: Overdue"
-                  : filterFromState.active
-                  ? "Filter: Active"
-                  : filterFromState.status
-                  ? `Filter: ${filterFromState.status}`
-                  : "Filter: My Tasks"
-              }
-              onDelete={handleClearAll}
-              color="primary"
-              variant="outlined"
-              size="small"
-              sx={{ borderRadius: "8px", fontWeight: 500 }}
-            />
-          </Box>
-        )}
+            <Box sx={{ mt: 1.5 }}>
+              <Chip
+                label={
+                  filterFromState.overdue
+                    ? "Filter: Overdue"
+                    : filterFromState.active
+                      ? "Filter: Active"
+                      : filterFromState.status
+                        ? `Filter: ${filterFromState.status}`
+                        : "Filter: My Tasks"
+                }
+                onDelete={handleClearAll}
+                color="primary"
+                variant="outlined"
+                size="small"
+                sx={{ borderRadius: "8px", fontWeight: 500 }}
+              />
+            </Box>
+          )}
       </Box>
 
       {/* Grid */}

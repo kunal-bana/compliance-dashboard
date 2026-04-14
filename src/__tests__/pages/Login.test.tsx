@@ -1,4 +1,3 @@
-// src/__tests__/pages/Login.test.tsx
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -7,7 +6,7 @@ import { MemoryRouter } from "react-router-dom";
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "../../features/auth/authSlice";
 
-// --- Firebase mocks ---
+//  Firebase mocks 
 const mockSignIn = jest.fn();
 const mockGetDocs = jest.fn();
 const mockNavigate = jest.fn();

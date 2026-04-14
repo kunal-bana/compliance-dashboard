@@ -1,4 +1,3 @@
-// src/__tests__/pages/DashboardHome.test.tsx
 import React from "react";
 import { screen, waitFor, fireEvent } from "@testing-library/react";
 import {
@@ -23,7 +22,7 @@ jest.mock("../../features/entities/entitiesApi",    () => ({ useGetEntitiesQuery
 jest.mock("../../features/regulations/regulationsApi", () => ({ useGetRegulationsQuery: () => mockUseGetRegulations() }));
 jest.mock("../../features/tasks/tasksApi",          () => ({ useGetTasksQuery:       () => mockUseGetTasks()       }));
 
-// Recharts – pure JSX, no require()
+// Recharts 
 jest.mock("recharts", () => ({
   ResponsiveContainer: ({ children }: { children: React.ReactNode }) =>
     <div data-testid="responsive-container">{children}</div>,

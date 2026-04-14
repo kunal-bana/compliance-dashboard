@@ -28,27 +28,18 @@ import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 
-/* ============================
-   DATE NORMALIZER (SAFE)
-   Fixes: non-serializable Firestore Timestamp in Redux store
-============================ */
 function normalizeDate(value: any): Date | null {
   if (!value) return null;
-  // Firestore Timestamp
   if (value?.toDate) return value.toDate();
-  // ISO / string date
   if (typeof value === "string") {
     const d = new Date(value);
     return isNaN(d.getTime()) ? null : d;
   }
-  // Already a plain Date
   if (value instanceof Date) return value;
   return null;
 }
 
-/* ============================
-   KPI CARD
-============================ */
+/*  KPI CARD */
 function KpiCard({
   title,
   value,
@@ -125,9 +116,7 @@ function KpiCard({
   );
 }
 
-/* ============================
-   SECTION HEADER
-============================ */
+/*  SECTION HEADER */
 function SectionHeader({ title }: { title: string }) {
   return (
     <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}>
@@ -139,9 +128,7 @@ function SectionHeader({ title }: { title: string }) {
   );
 }
 
-/* ============================
-   DASHBOARD HOME
-============================ */
+/*  DASHBOARD HOME*/
 export default function DashboardHome() {
   const role = useSelector((state: RootState) => state.auth.role);
   const currentUserId = useSelector((state: RootState) => state.auth.uid);
@@ -179,9 +166,7 @@ export default function DashboardHome() {
     }
   };
 
-  /* ============================
-     METRICS
-  ============================ */
+  /* METRICS */
   const totalEntities = entities.length;
   const activeRegulations = regulations.filter((r: any) => r.status === "Active").length;
   const totalTasks = enrichedTasks.length;
@@ -193,9 +178,7 @@ export default function DashboardHome() {
   const myCompletedTasks = myTasks.filter((t: any) => t.computedStatus === "Completed").length;
   const myOverdueTasks = myTasks.filter((t: any) => t.computedStatus === "Overdue").length;
 
-  /* ============================
-     ROLE BASED CARDS
-  ============================ */
+  /* ROLE BASED CARDS */
   let cards: {
     title: string;
     value: number;
@@ -304,9 +287,7 @@ export default function DashboardHome() {
     ];
   }
 
-  /* ============================
-     LINE CHART DATA
-  ============================ */
+  /* LINE CHART DATA */
   const lineChartData = (() => {
     const monthMap: Record<string, number> = {};
     tasks.forEach((t: any) => {
@@ -328,9 +309,7 @@ export default function DashboardHome() {
       }));
   })();
 
-  /* ============================
-     PIE CHART DATA
-  ============================ */
+  /* PIE CHART DATA */
   const pieData = [
     { name: "Pending", value: enrichedTasks.filter((t: any) => t.computedStatus === "Pending").length },
     { name: "In Progress", value: enrichedTasks.filter((t: any) => t.computedStatus === "In Progress").length },
@@ -349,9 +328,7 @@ export default function DashboardHome() {
     },
   };
 
-  /* ============================
-     RENDER
-  ============================ */
+  /* RENDER */
   return (
     <Box>
       {/* Page header */}

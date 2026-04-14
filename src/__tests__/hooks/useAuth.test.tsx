@@ -1,4 +1,3 @@
-// src/__tests__/hooks/useAuth.test.tsx
 import React from "react";
 import { renderHook, act } from "@testing-library/react";
 import { Provider } from "react-redux";

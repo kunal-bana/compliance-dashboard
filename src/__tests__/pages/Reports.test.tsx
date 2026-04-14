@@ -1,4 +1,3 @@
-// src/__tests__/pages/Reports.test.tsx
 import React from "react";
 import { screen, fireEvent, waitFor } from "@testing-library/react";
 import {

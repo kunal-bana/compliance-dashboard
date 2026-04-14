@@ -1,6 +1,3 @@
-// src/__tests__/utils/normalizeDate.test.ts
-
-// Inline the function since it's duplicated across files
 function normalizeDate(value: any): Date | null {
   if (!value) return null;
   if (value?.toDate) return value.toDate();
@@ -93,7 +90,6 @@ describe("normalizeDate utility", () => {
     });
 
     it("returns null for numbers (non-falsy)", () => {
-      // Numbers without toDate return null
       expect(normalizeDate(12345)).toBeNull();
     });
   });

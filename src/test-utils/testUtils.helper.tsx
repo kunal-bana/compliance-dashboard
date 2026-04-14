@@ -1,4 +1,3 @@
-// src/__tests__/utils/testUtils.tsx
 import React from "react";
 import { render, type RenderOptions } from "@testing-library/react";
 import { configureStore } from "@reduxjs/toolkit";
@@ -6,7 +5,6 @@ import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
 import authReducer from "../features/auth/authSlice";
 
-// Infer the auth state shape directly from the reducer – no import of AuthState needed
 type AuthSliceState = ReturnType<typeof authReducer>;
 
 interface ExtendedRenderOptions extends Omit<RenderOptions, "wrapper"> {

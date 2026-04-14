@@ -35,9 +35,7 @@ import {
   Legend,
 } from "recharts";
 
-/* ============================
-   STATUS CONFIG
-============================ */
+/*STATUS CONFIG */
 const statusConfig: any = {
   Pending: {
     color: "warning",
@@ -69,10 +67,8 @@ const statusConfig: any = {
   },
 };
 
-/* ============================
-   DATE SAFE HANDLER
-   Fixes: non-serializable Firestore Timestamp in Redux store
-============================ */
+/*DATE SAFE HANDLER
+   Fixes: non-serializable Firestore Timestamp in Redux store */
 function normalizeDate(value: any): Date | null {
   if (!value) return null;
   if (value?.toDate) return value.toDate();
@@ -84,9 +80,7 @@ function normalizeDate(value: any): Date | null {
   return null;
 }
 
-/* ============================
-   STAT CARD
-============================ */
+/*STAT CARD */
 function StatCard({
   status,
   count,
@@ -147,9 +141,7 @@ function StatCard({
   );
 }
 
-/* ============================
-   COMPONENT
-============================ */
+/*COMPONENT */
 export default function Reports() {
   const role = useSelector((state: RootState) => state.auth.role);
   const currentUserId = useSelector((state: RootState) => state.auth.uid);
@@ -159,9 +151,7 @@ export default function Reports() {
 
   const [selectedRegulation, setSelectedRegulation] = useState<string | null>(null);
 
-  /* ============================
-     OVERDUE AUTO CALCULATION
-  ============================ */
+  /*OVERDUE AUTO CALCULATION*/
   const enrichedTasks = useMemo(() => {
     return tasks.map((task: any) => {
       const due = normalizeDate(task.dueDate);
@@ -181,24 +171,18 @@ export default function Reports() {
     }
   };
 
-  /* ============================
-     ROLE BASED FILTER
-  ============================ */
+  /*ROLE BASED FILTER*/
   const roleTasks =
     role === "VIEWER"
       ? enrichedTasks.filter((t: any) => t.assignedTo === currentUserId)
       : enrichedTasks;
 
-  /* ============================
-     REGULATION FILTER
-  ============================ */
+  /*REGULATION FILTER*/
   const filteredTasks = selectedRegulation
     ? roleTasks.filter((t: any) => t.regulationId === selectedRegulation)
     : roleTasks;
 
-  /* ============================
-     STATUS SUMMARY
-  ============================ */
+  /*STATUS SUMMARY*/
   const statusSummary = {
     Pending: filteredTasks.filter((t: any) => t.computedStatus === "Pending").length,
     "In Progress": filteredTasks.filter((t: any) => t.computedStatus === "In Progress").length,
@@ -206,18 +190,14 @@ export default function Reports() {
     Overdue: filteredTasks.filter((t: any) => t.computedStatus === "Overdue").length,
   };
 
-  /* ============================
-     PIE CHART DATA
-  ============================ */
+  /*PIE CHART DATA*/
   const pieData = Object.entries(statusSummary).map(([status, count]) => ({
     name: status,
     value: count,
     color: statusConfig[status].chartColor,
   }));
 
-  /* ============================
-     MONTHLY LINE DATA
-  ============================ */
+  /*MONTHLY LINE DATA*/
   const lineData = useMemo(() => {
     const monthMap: Record<string, number> = {};
     filteredTasks.forEach((task: any) => {
@@ -248,9 +228,7 @@ export default function Reports() {
     },
   };
 
-  /* ============================
-     RENDER
-  ============================ */
+  /*RENDER*/
   return (
     <Box sx={{ width: "100%" }}>
       {/* Page Header */}

@@ -1,4 +1,3 @@
-// src/__tests__/features/auth/authSlice.test.ts
 import authReducer, { setUser, logout } from "../../../features/auth/authSlice";
 
 describe("authSlice", () => {

@@ -1,7 +1,3 @@
-// src/__tests__/hooks/usePermission.test.tsx
-// Feature keys and action keys are cast with `as any` so the test file
-// compiles regardless of the exact PERMISSIONS shape in your codebase.
-// The mock below overrides the real module, so the runtime values are what matter.
 import React from "react";
 import { renderHook } from "@testing-library/react";
 import { Provider } from "react-redux";
@@ -9,7 +5,6 @@ import { makeTestStore } from "../../test-utils/testUtils.helper";
 
 jest.mock("../../services/firebase", () => ({ auth: {}, db: {} }));
 
-// Override the real permissions config with a known shape
 jest.mock("../../config/permissions", () => ({
   PERMISSIONS: {
     ENTITY: {
@@ -50,7 +45,6 @@ function makeWrapper(role: "ADMIN" | "MANAGER" | "VIEWER" | null) {
   };
 }
 
-// Helper so we don't have to fight TS strict types on the feature key
 function useP(feature: any, action: any) {
   return usePermission(feature, action);
 }

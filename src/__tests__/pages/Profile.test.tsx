@@ -1,4 +1,3 @@
-// src/__tests__/pages/Profile.test.tsx
 import React from "react";
 import { screen } from "@testing-library/react";
 import { renderWithProviders, adminState, managerState, viewerState } from "../../test-utils/testUtils.helper";
