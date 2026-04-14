@@ -7,7 +7,7 @@ export const PERMISSIONS = {
     DELETE: ["ADMIN"],
   },
   REGULATION: {
-    CREATE: ["ADMIN", "MANAGER"],
+    CREATE: ["ADMIN", "MANAGER"], 
     UPDATE: ["ADMIN", "MANAGER"],
     DELETE: ["ADMIN"],
   },

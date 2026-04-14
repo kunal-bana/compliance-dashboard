@@ -5,7 +5,7 @@
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
-    "types": ["node"]
+    "types": ["jest", "node","vite/client"]
   }
 
 }

@@ -29,7 +29,7 @@ export function ThemeContextProvider({
     const saved = localStorage.getItem(STORAGE_KEY);
     return saved === "dark" ? "dark" : "light";
   });
-    // 🔹 TOGGLE THEME FUNCTION
+    //  TOGGLE THEME FUNCTION
   const toggleTheme = () => {
     setMode((prev) => {
       const next = prev === "light" ? "dark" : "light";
@@ -37,7 +37,7 @@ export function ThemeContextProvider({
       return next;
     });
   };
-    // 🔹 THEME OBJECT
+    //  THEME OBJECT
   const theme = useMemo(
     () =>
       createTheme({

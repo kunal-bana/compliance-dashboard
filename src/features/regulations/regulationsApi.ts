@@ -37,7 +37,7 @@ export const regulationsApi = createApi({
 
           return { data };
         } catch (error) {
-          return { error };
+          return { error: error as any };
         }
       },
       providesTags: (result) =>
@@ -59,7 +59,7 @@ export const regulationsApi = createApi({
           });
           return { data: undefined };
         } catch (error) {
-          return { error };
+          return { error: error as any };
         }
       },
       invalidatesTags: [{ type: "Regulations", id: "LIST" }],
@@ -75,7 +75,7 @@ export const regulationsApi = createApi({
           await updateDoc(doc(db, "regulations", id), data);
           return { data: undefined };
         } catch (error) {
-          return { error };
+          return { error: error as any };
         }
       },
       invalidatesTags: [{ type: "Regulations", id: "LIST" }],
@@ -88,7 +88,7 @@ export const regulationsApi = createApi({
           await deleteDoc(doc(db, "regulations", id));
           return { data: undefined };
         } catch (error) {
-          return { error };
+          return { error: error as any };
         }
       },
       invalidatesTags: [{ type: "Regulations", id: "LIST" }],

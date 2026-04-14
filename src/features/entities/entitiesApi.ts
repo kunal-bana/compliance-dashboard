@@ -37,7 +37,7 @@ export const entitiesApi = createApi({
 
           return { data };
         } catch (error) {
-          return { error };
+          return { error: error as any };
         }
       },
       providesTags: (result) =>
@@ -59,7 +59,7 @@ export const entitiesApi = createApi({
           await updateDoc(doc(db, "entities", id), data);
           return { data: undefined };
         } catch (error) {
-          return { error };
+          return { error: error as any };
         }
       },
 
@@ -90,7 +90,7 @@ export const entitiesApi = createApi({
           await deleteDoc(doc(db, "entities", id));
           return { data: undefined };
         } catch (error) {
-          return { error };
+          return { error: error as any };
         }
       },
 
@@ -126,7 +126,7 @@ export const entitiesApi = createApi({
       });
       return { data: undefined };
     } catch (error) {
-      return { error };
+      return { error: error as any };
     }
   },
   invalidatesTags: [{ type: "Entities", id: "LIST" }],

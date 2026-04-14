@@ -22,7 +22,6 @@ import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import ShieldOutlinedIcon from "@mui/icons-material/ShieldOutlined";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -98,21 +97,6 @@ export default function Login() {
       <Container maxWidth="xs" sx={{ position: "relative", zIndex: 1 }}>
         {/* Brand */}
         <Box sx={{ mb: 5, textAlign: "center" }}>
-          <Box
-            sx={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: 52,
-              height: 52,
-              borderRadius: "14px",
-              bgcolor: "background.paper",
-              mb: 2,
-              boxShadow: "0 8px 32px rgba(99,102,241,0.4)",
-            }}
-          >
-            <ShieldOutlinedIcon sx={{ color: "#fff", fontSize: 26 }} />
-          </Box>
           <Typography
             variant="h4"
             sx={{

@@ -13,7 +13,7 @@ import { ThemeContextProvider } from "./theme/ThemeContext";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Provider store={store}>
-      <BrowserRouter>
+      <BrowserRouter> 
         <ThemeContextProvider>
           <CssBaseline />
           <AuthListener />

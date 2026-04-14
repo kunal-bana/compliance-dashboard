@@ -49,7 +49,7 @@ export const usersApi = createApi({
           await updateDoc(doc(db, "users", uid), data);
           return { data: undefined };
         } catch (error) {
-          return { error };
+          return { error: error as any };
         }
       },
       invalidatesTags: ["Users"],
@@ -61,7 +61,7 @@ export const usersApi = createApi({
           await deleteDoc(doc(db, "users", uid));
           return { data: undefined };
         } catch (error) {
-          return { error };
+          return { error: error as any };
         }
       },
       invalidatesTags: ["Users"],

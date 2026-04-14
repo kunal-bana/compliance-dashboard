@@ -19,7 +19,6 @@ import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import ShieldOutlinedIcon from "@mui/icons-material/ShieldOutlined";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -101,21 +100,6 @@ export default function Register() {
     >
       <Container maxWidth="xs" sx={{ position: "relative", zIndex: 1 }}>
         <Box sx={{ mb: 5, textAlign: "center" }}>
-          <Box
-            sx={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: 52,
-              height: 52,
-              borderRadius: "14px",
-              background: "linear-gradient(135deg, #3b82f6, #6366f1)",
-              mb: 2,
-              boxShadow: "0 8px 32px rgba(99,102,241,0.4)",
-            }}
-          >
-            <ShieldOutlinedIcon sx={{ color: "#fff", fontSize: 26 }} />
-          </Box>
           <Typography
             variant="h4"
             sx={{
@@ -146,7 +130,7 @@ export default function Register() {
           <Typography variant="h5" fontWeight={700} sx={{ color: "#fff", mb: 0.5 }}>
             Create Account
           </Typography>
-          <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.5)", mb: 4 }}>
+          <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.5)", mb: 2 }}>
             Join the platform to manage enterprise compliance efficiently.
           </Typography>
 

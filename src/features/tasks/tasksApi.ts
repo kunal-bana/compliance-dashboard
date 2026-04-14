@@ -77,10 +77,16 @@ export const tasksApi = createApi({
 
           return { data };
         } catch (error) {
-          return { error };
+          return { error: error as any };
         }
       },
-      providesTags: ["Tasks"],
+      providesTags: (result) =>
+        result
+          ? [
+            ...result.map(({ id }) => ({ type: "Tasks" as const, id })),
+            { type: "Tasks", id: "LIST" },
+          ]
+          : [{ type: "Tasks", id: "LIST" }],
     }),
 
     addTask: builder.mutation<void, CreateTaskInput>({
@@ -102,7 +108,7 @@ export const tasksApi = createApi({
           });
           return { data: undefined };
         } catch (error) {
-          return { error };
+          return { error: error as any };
         }
       },
       invalidatesTags: ["Tasks"],
@@ -125,7 +131,7 @@ export const tasksApi = createApi({
           await updateDoc(doc(db, "tasks", id), updatedData);
           return { data: undefined };
         } catch (error) {
-          return { error };
+          return { error: error as any };
         }
       },
       invalidatesTags: ["Tasks"],
@@ -137,7 +143,7 @@ export const tasksApi = createApi({
           await deleteDoc(doc(db, "tasks", id));
           return { data: undefined };
         } catch (error) {
-          return { error };
+          return { error: error as any };
         }
       },
       invalidatesTags: ["Tasks"],
