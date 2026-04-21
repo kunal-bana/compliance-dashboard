@@ -1,73 +1,126 @@
-# React + TypeScript + Vite
+# Compliance Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack Compliance Management System with role-based access control.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 📁 Project Structure
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+compliance-dashboard/
+│
+├── backend/        # Node.js + Express + MongoDB
+├── frontend/       # React + Vite + TypeScript
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🚀 Tech Stack
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Frontend
+
+* React.js
+* TypeScript
+* Vite
+* Axios
+
+### Backend
+
+* Node.js
+* Express.js
+* MongoDB (Mongoose)
+* JWT Authentication
+
+---
+
+## 🔐 Features
+
+* Role-based access (ADMIN, MANAGER, VIEWER)
+* Entity Management
+* Regulation Management
+* Task Tracking
+* Authentication & Authorization
+* Secure API with JWT
+
+---
+
+## ⚙️ Setup Instructions
+
+### 1️⃣ Clone the repository
+
 ```
+git clone <your-repo-url>
+cd compliance-dashboard
+```
+
+---
+
+### 2️⃣ Setup Backend
+
+```
+cd backend
+npm install
+```
+
+Create `.env`:
+
+```
+PORT=5000
+MONGO_URI=your_mongodb_uri
+JWT_SECRET=your_secret
+```
+
+Run backend:
+
+```
+npm run dev
+```
+
+---
+
+### 3️⃣ Setup Frontend
+
+```
+cd frontend
+npm install
+npm run dev
+```
+
+---
+
+## 🌐 API Base URL
+
+```
+http://localhost:5000/api
+```
+
+---
+
+## 🧪 Testing (Optional)
+
+```
+npm install --save-dev @types/jest
+```
+
+---
+
+## 📌 Notes
+
+* First registered user becomes **ADMIN**
+* All APIs are protected via JWT
+* Role-based middleware controls access
+
+---
+
+## 🚀 Future Improvements
+
+* Audit Logs
+* Notifications
+* File Upload (Cloudinary)
+* Dashboard Analytics
+
+---
+
+## 👨‍💻 Author
+
+Kunal Bana
