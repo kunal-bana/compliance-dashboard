@@ -1,4 +1,4 @@
-const Regulation = require("../models/Regulation");
+const Regulation = require("../models/regulation");
 const asyncHandler = require("../utils/asyncHandler");
 const AppError = require("../utils/AppError");
 
