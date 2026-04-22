@@ -4,8 +4,7 @@ import { CircularProgress, Box } from "@mui/material";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import { Typography } from "@mui/material";
 import { useAuthInit } from "./hooks/useAuthInit";
-import { useSelector } from "react-redux";
-import type { RootState } from "./app/store";
+import PublicRoute from "./routes/PublicRoute";
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -16,7 +15,6 @@ const Tasks = lazy(() => import("./pages/Tasks"));
 const Reports = lazy(() => import("./pages/Reports"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Profile = lazy(() => import("./pages/Profile"));
-
 const PageLoader = () => (
   <Box
     sx={{
@@ -116,8 +114,23 @@ function App() {
     <Suspense fallback={<PageLoader />}>
       <Routes>
         {/* PUBLIC */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+
+        <Route
+          path="/register"
+          element={
+            <PublicRoute>
+              <Register />
+            </PublicRoute>
+          }
+        />
 
         {/* PROTECTED DASHBOARD */}
         <Route
