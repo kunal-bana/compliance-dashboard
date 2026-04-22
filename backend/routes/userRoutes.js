@@ -5,15 +5,19 @@ const ctrl = require("../controllers/userController");
 
 /**
  * @swagger
+ * tags:
+ *   name: Users
+ *   description: User management APIs
+ */
+
+/**
+ * @swagger
  * /api/users:
  *   get:
  *     summary: Get all users
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: List of users
  */
 router.get("/", auth, role("ADMIN", "MANAGER"), ctrl.getUsers);
 
@@ -34,6 +38,8 @@ router.post("/create", auth, role("ADMIN"), ctrl.createUser);
  *   put:
  *     summary: Update user role
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  */
 router.put("/role/:id", auth, role("ADMIN"), ctrl.updateUserRole);
 
@@ -43,6 +49,8 @@ router.put("/role/:id", auth, role("ADMIN"), ctrl.updateUserRole);
  *   delete:
  *     summary: Delete user
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  */
 router.delete("/:id", auth, role("ADMIN"), ctrl.deleteUser);
 
@@ -52,6 +60,8 @@ router.delete("/:id", auth, role("ADMIN"), ctrl.deleteUser);
  *   get:
  *     summary: Get current user profile
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  */
 router.get("/me", auth, ctrl.getProfile);
 
@@ -61,6 +71,8 @@ router.get("/me", auth, ctrl.getProfile);
  *   post:
  *     summary: Change password
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  */
 router.post("/change-password", auth, ctrl.changePassword);
 

@@ -1,27 +1,28 @@
 const router = require("express").Router();
 const { login, register } = require("../controllers/authController");
 
-router.post("/login", login);
+/**
+ * @swagger
+ * tags:
+ *   name: Auth
+ *   description: Authentication APIs
+ */
+
 /**
  * @swagger
  * /api/auth/register:
  *   post:
- *     summary: Register new user
+ *     summary: Register user
  *     tags: [Auth]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *               password:
- *                 type: string
+ *             $ref: '#/components/schemas/AuthInput'
  *     responses:
  *       200:
- *         description: User registered successfully
+ *         description: User registered
  */
 router.post("/register", register);
 
@@ -29,8 +30,14 @@ router.post("/register", register);
  * @swagger
  * /api/auth/login:
  *   post:
- *     summary: Login user
+ *     summary: Login user and get JWT
  *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/AuthInput'
  *     responses:
  *       200:
  *         description: Login successful
