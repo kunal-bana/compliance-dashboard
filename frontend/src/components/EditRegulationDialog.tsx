@@ -38,9 +38,6 @@ export default function EditRegulationDialog({ open, regulation, onClose }: any)
       onClose={onClose}
       fullWidth
       maxWidth="sm"
-      PaperProps={{
-        sx: { borderRadius: 1, p: 1 }
-      }}
     >
       {/* RESPONSIVE HEADER */}
       <DialogTitle sx={{ m: 0, p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

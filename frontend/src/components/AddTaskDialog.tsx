@@ -70,7 +70,6 @@ export default function AddTaskDialog({ open, onClose }: Props) {
       onClose={onClose}
       fullWidth
       maxWidth="md"
-      PaperProps={{ sx: { borderRadius: 1, p: 1 } }}
     >
       {/* PROFESSIONAL HEADER */}
       <DialogTitle sx={{ m: 0, p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

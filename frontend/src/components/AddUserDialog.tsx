@@ -78,9 +78,6 @@ export default function AddUserDialog({ open, onClose }: Props) {
       onClose={onClose}
       fullWidth
       maxWidth="sm"
-      PaperProps={{
-        sx: { borderRadius: 1, p: 1 }
-      }}
     >
       <DialogTitle sx={{ m: 0, p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Stack direction="row" spacing={1.5} alignItems="center">

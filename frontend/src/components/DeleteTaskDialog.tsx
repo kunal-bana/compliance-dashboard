@@ -31,9 +31,6 @@ export default function DeleteTaskDialog({ open, taskId, onClose }: any) {
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: { borderRadius: 1, maxWidth: 400 }
-      }}
     >
       {/* PROFESSIONAL WARNING HEADER */}
       <DialogTitle sx={{ m: 0, p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

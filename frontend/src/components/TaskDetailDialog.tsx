@@ -73,7 +73,6 @@ export default function TaskDetailDialog({
         onClose={onClose}
         fullWidth
         maxWidth="md"
-        PaperProps={{ sx: { borderRadius: 1, p: 1 } }}
       >
         {/* ENHANCED HEADER */}
         <DialogTitle
@@ -111,7 +110,39 @@ export default function TaskDetailDialog({
           </IconButton>
         </DialogTitle>
 
-        <DialogContent dividers sx={{ borderTop: "none", borderBottom: "none", py: 3 }}>
+        <DialogContent
+          dividers
+          sx={{
+            borderTop: "none",
+            borderBottom: "none",
+            py: 3,
+            maxHeight: "70vh",
+            overflowY: "auto",
+
+            /* Smooth scroll */
+            scrollBehavior: "smooth",
+
+            /*Chrome / Edge / Safari */
+            "&::-webkit-scrollbar": {
+              width: "6px",
+            },
+            "&::-webkit-scrollbar-track": {
+              background: "transparent",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              background: "linear-gradient(180deg, #6366f1, #3b82f6)",
+              borderRadius: "10px",
+              transition: "all 0.3s ease",
+            },
+            "&::-webkit-scrollbar-thumb:hover": {
+              background: "linear-gradient(180deg, #4f46e5, #2563eb)",
+            },
+
+            /*Firefox */
+            scrollbarWidth: "thin",
+            scrollbarColor: "#6366f1 transparent",
+          }}
+        >
           <Grid container spacing={4}>
             {/* LEFT COLUMN: PRIMARY INFO */}
             <Grid size={{ xs: 12, md: 6 }}>
@@ -119,21 +150,21 @@ export default function TaskDetailDialog({
                 <Box>
                   <DataLabel>Entity</DataLabel>
                   <Typography variant="body1" fontWeight={500}>
-                    {entityMap[task.entityId] || "—"}
+                    {task.entityId?.name || "Not linked"}
                   </Typography>
                 </Box>
 
                 <Box>
                   <DataLabel>Regulation Mapping</DataLabel>
                   <Typography variant="body1" fontWeight={500}>
-                    {regulationMap[task.regulationId] || "—"}
+                    {task.regulationId?.title || "Not linked"}
                   </Typography>
                 </Box>
 
                 <Box>
                   <DataLabel>Assigned To</DataLabel>
                   <Typography variant="body1" fontWeight={500}>
-                    {userMap[task.assignedTo] || "—"}
+                    {task.assignedTo?.email || "Unassigned"}
                   </Typography>
                 </Box>
 
@@ -144,17 +175,17 @@ export default function TaskDetailDialog({
                       ? new Date(task.dueDate).toLocaleDateString("en-GB")
                       : "—"}
                   </Typography>
+                  {isOverdue && (
+                    <Typography
+                      variant="caption"
+                      color="error"
+                      sx={{ mt: 1, display: "block" }}>
+                      This task is overdue. Update due date to modify status.
+                    </Typography>
+                  )}
                 </Box>
               </Stack>
             </Grid>
-            {isOverdue && (
-              <Typography
-                variant="caption"
-                color="error"
-                sx={{ mt: 1, display: "block" }}>
-                This task is overdue. Update due date to modify status.
-              </Typography>
-            )}
             {/* RIGHT COLUMN: METADATA & CHIPS */}
             <Grid size={{ xs: 12, md: 6 }}>
               <Stack spacing={3}>
@@ -187,7 +218,7 @@ export default function TaskDetailDialog({
 
                 <Box>
                   <DataLabel>Created By</DataLabel>
-                  <Typography variant="body2">{userMap[task.createdBy] || "—"}</Typography>
+                  <Typography variant="body2">{task.createdBy?.email || "Unknown"}</Typography>
                 </Box>
 
                 <Box>

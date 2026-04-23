@@ -78,9 +78,6 @@ export default function EditTaskDialog({ open, task, onClose }: Props) {
       onClose={onClose}
       fullWidth
       maxWidth="sm"
-      PaperProps={{
-        sx: { borderRadius: 1, p: 1 }
-      }}
     >
       {/* BRANDED HEADER */}
       <DialogTitle sx={{ m: 0, p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

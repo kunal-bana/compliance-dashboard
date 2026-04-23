@@ -44,9 +44,6 @@ export default function AddEntityDialog({ open, onClose }: Props) {
       onClose={onClose}
       fullWidth
       maxWidth="sm"
-      PaperProps={{
-        sx: { borderRadius: 1, p: 1 }
-      }}
     >
       {/* PROFESSIONAL HEADER */}
       <DialogTitle sx={{ m: 0, p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

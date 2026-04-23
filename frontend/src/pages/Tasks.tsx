@@ -71,7 +71,10 @@ export default function Tasks() {
         if (statusFilter === "Overdue") { if (!isTaskOverdue(task)) return false; }
         else { if (task.status !== statusFilter) return false; }
       }
-      if (filterFromState.assignedTo && task.assignedTo !== filterFromState.assignedTo) return false;
+      if (
+        filterFromState.assignedTo &&
+        task.assignedTo?._id !== filterFromState.assignedTo
+      ) return false;
       if (filterFromState.overdue) { if (!isTaskOverdue(task)) return false; }
       if (filterFromState.active) { if (task.status === "Completed" || isTaskOverdue(task)) return false; }
       if (filterFromState.status && task.status !== filterFromState.status) return false;
