@@ -1,110 +1,365 @@
-const User = require("../models/user");
-const bcrypt = require("bcryptjs");
-const asyncHandler = require("../utils/asyncHandler");
-const AppError = require("../utils/AppError");
+const User = require('../models/user');
+const bcrypt = require('bcryptjs');
+const asyncHandler = require('../utils/asyncHandler');
+const AppError = require('../utils/AppError');
+const validators = require('../utils/validators');
 
-// GET USERS
+/**
+ * Get all users (excluding password field)
+ * @route GET /api/users
+ * @access ADMIN, MANAGER
+ */
 exports.getUsers = asyncHandler(async (req, res) => {
-  const users = await User.find().select("-password");
+  try {
+    const users = await User.find().select('-password').sort({ createdAt: -1 });
 
-  const formatted = users.map((u) => ({
-    ...u.toObject(),
-    id: u._id,
-  }));
+    if (!users || users.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: 'No users found',
+        data: [],
+      });
+    }
 
-  res.json(formatted);
+    const formatted = users.map((u) => ({
+      ...u.toObject(),
+      id: u._id,
+    }));
+
+    res.status(200).json({
+      success: true,
+      message: 'Users retrieved successfully',
+      data: formatted,
+      count: formatted.length,
+    });
+  } catch (error) {
+    console.error('Database error in getUsers:', error);
+    throw new AppError('Failed to retrieve users', 500);
+  }
 });
 
-// CREATE USER
+/**
+ * Create a new user
+ * @route POST /api/users/create
+ * @access ADMIN
+ * @param {string} email - User email (required, unique)
+ * @param {string} password - User password (required, min 6 chars)
+ * @param {string} role - User role (required, must be ADMIN, MANAGER, or VIEWER)
+ */
 exports.createUser = asyncHandler(async (req, res) => {
   const { email, password, role } = req.body;
 
-  if (!email || !password || !role) {
-    throw new AppError("All fields required", 400);
+  // Validate required fields
+  validators.validateRequired({ email, password, role }, ['email', 'password', 'role']);
+
+  // Validate email format
+  validators.validateEmail(email);
+
+  // Validate password strength
+  validators.validatePassword(password);
+
+  // Validate role
+  const allowedRoles = ['ADMIN', 'MANAGER', 'VIEWER'];
+  validators.validateEnum(role, allowedRoles, 'role');
+
+  // Check if user already exists
+  let existingUser;
+  try {
+    existingUser = await User.findOne({ email: email.toLowerCase() });
+  } catch (error) {
+    console.error('Database query error:', error);
+    throw new AppError('Failed to verify email availability', 500);
   }
 
-  const allowedRoles = ["ADMIN", "MANAGER", "VIEWER"];
-  if (!allowedRoles.includes(role)) {
-    throw new AppError("Invalid role", 400);
+  if (existingUser) {
+    throw new AppError('Email already registered', 400);
   }
 
-  const exists = await User.findOne({ email });
-  if (exists) {
-    throw new AppError("User already exists", 400);
+  // Hash password
+  let hashedPassword;
+  try {
+    hashedPassword = await bcrypt.hash(password, 10);
+  } catch (error) {
+    console.error('Password hashing error:', error);
+    throw new AppError('Failed to process password', 500);
   }
 
-  const hashed = await bcrypt.hash(password, 10);
+  // Create user
+  let user;
+  try {
+    user = await User.create({
+      email: email.toLowerCase(),
+      password: hashedPassword,
+      role,
+    });
+  } catch (error) {
+    if (error.code === 11000) {
+      throw new AppError('Email already registered', 400);
+    }
+    if (error.name === 'ValidationError') {
+      const message = Object.values(error.errors)
+        .map(e => e.message)
+        .join(', ');
+      throw new AppError(message, 400);
+    }
+    console.error('User creation error:', error);
+    throw new AppError('Failed to create user', 500);
+  }
 
-  const user = await User.create({
-    email,
-    password: hashed,
-    role,
-  });
+  const userObject = user.toObject();
+  delete userObject.password;
 
   res.status(201).json({
-    ...user.toObject(),
-    id: user._id,
+    success: true,
+    message: 'User created successfully',
+    data: {
+      ...userObject,
+      id: user._id,
+    },
   });
 });
 
-// UPDATE ROLE
+/**
+ * Update user role
+ * @route PUT /api/users/role/:id
+ * @access ADMIN
+ * @param {string} id - User ID (required, must be valid MongoDB ObjectId)
+ * @param {string} role - New role (required, must be ADMIN, MANAGER, or VIEWER)
+ */
 exports.updateUserRole = asyncHandler(async (req, res) => {
-  const allowedRoles = ["ADMIN", "MANAGER", "VIEWER"];
+  const { id } = req.params;
+  const { role } = req.body;
 
-  if (!allowedRoles.includes(req.body.role)) {
-    throw new AppError("Invalid role", 400);
+  // Validate ID
+  validators.validateObjectId(id);
+
+  // Validate role
+  if (!role) {
+    throw new AppError('New role is required', 400);
   }
 
-  const user = await User.findByIdAndUpdate(
-    req.params.id,
-    { role: req.body.role },
-    { new: true }
-  ).select("-password");
+  const allowedRoles = ['ADMIN', 'MANAGER', 'VIEWER'];
+  validators.validateEnum(role, allowedRoles, 'role');
+
+  // Check if user exists
+  let user;
+  try {
+    user = await User.findById(id);
+  } catch (error) {
+    console.error('User lookup error:', error);
+    throw new AppError('Failed to retrieve user', 500);
+  }
 
   if (!user) {
-    throw new AppError("User not found", 404);
+    throw new AppError('User not found', 404);
   }
 
-  res.json({ ...user.toObject(), id: user._id });
+  // Prevent changing own role to prevent lockout
+  if (req.user.id === id && req.user.role === 'ADMIN' && role !== 'ADMIN') {
+    throw new AppError('Cannot change your own role from ADMIN. Please ask another ADMIN to change your role.', 400);
+  }
+
+  // Update role
+  let updated;
+  try {
+    updated = await User.findByIdAndUpdate(
+      id,
+      { role },
+      { new: true, runValidators: true }
+    ).select('-password');
+  } catch (error) {
+    if (error.name === 'ValidationError') {
+      const message = Object.values(error.errors)
+        .map(e => e.message)
+        .join(', ');
+      throw new AppError(message, 400);
+    }
+    console.error('Role update error:', error);
+    throw new AppError('Failed to update user role', 500);
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'User role updated successfully',
+    data: {
+      ...updated.toObject(),
+      id: updated._id,
+    },
+  });
 });
 
-// DELETE USER
+/**
+ * Delete a user
+ * @route DELETE /api/users/:id
+ * @access ADMIN
+ * @param {string} id - User ID (required, must be valid MongoDB ObjectId)
+ */
 exports.deleteUser = asyncHandler(async (req, res) => {
-  if (req.user.id === req.params.id) {
-    throw new AppError("Cannot delete yourself", 400);
+  const { id } = req.params;
+
+  // Validate ID
+  validators.validateObjectId(id);
+
+  // Prevent self-deletion
+  if (req.user.id === id) {
+    throw new AppError('Cannot delete your own account. Please ask another administrator.', 400);
   }
 
-  const user = await User.findById(req.params.id);
+  // Check if user exists
+  let user;
+  try {
+    user = await User.findById(id);
+  } catch (error) {
+    console.error('User lookup error:', error);
+    throw new AppError('Failed to retrieve user', 500);
+  }
 
   if (!user) {
-    throw new AppError("User not found", 404);
+    throw new AppError('User not found', 404);
   }
 
-  await User.findByIdAndDelete(req.params.id);
+  // Prevent deleting the last ADMIN
+  if (user.role === 'ADMIN') {
+    let adminCount;
+    try {
+      adminCount = await User.countDocuments({ role: 'ADMIN' });
+    } catch (error) {
+      console.error('Admin count error:', error);
+      throw new AppError('Failed to verify admin count', 500);
+    }
 
-  res.json({ success: true });
+    if (adminCount === 1) {
+      throw new AppError('Cannot delete the last ADMIN user. Promote another user to ADMIN first.', 400);
+    }
+  }
+
+  // Delete user
+  let deleted;
+  try {
+    deleted = await User.findByIdAndDelete(id);
+  } catch (error) {
+    console.error('User deletion error:', error);
+    throw new AppError('Failed to delete user', 500);
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'User deleted successfully',
+    data: {
+      id: deleted._id,
+    },
+  });
 });
 
-// PROFILE
+/**
+ * Get current user profile
+ * @route GET /api/users/me
+ * @access All authenticated users
+ */
 exports.getProfile = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id).select("-password");
+  if (!req.user || !req.user.id) {
+    throw new AppError('User not authenticated', 401);
+  }
+
+  let user;
+  try {
+    user = await User.findById(req.user.id).select('-password');
+  } catch (error) {
+    console.error('User lookup error:', error);
+    throw new AppError('Failed to retrieve user profile', 500);
+  }
 
   if (!user) {
-    throw new AppError("User not found", 404);
+    throw new AppError('User not found', 404);
   }
 
-  res.json({ ...user.toObject(), id: user._id });
+  if (!user.isActive) {
+    throw new AppError('Account has been deactivated', 403);
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'Profile retrieved successfully',
+    data: {
+      ...user.toObject(),
+      id: user._id,
+    },
+  });
 });
 
-// CHANGE PASSWORD
+/**
+ * Change password for current user
+ * @route POST /api/users/change-password
+ * @access All authenticated users
+ * @param {string} currentPassword - Current password (optional but recommended)
+ * @param {string} newPassword - New password (required, min 6 chars)
+ */
 exports.changePassword = asyncHandler(async (req, res) => {
-  if (!req.body.newPassword) {
-    throw new AppError("New password required", 400);
+  const { currentPassword, newPassword } = req.body;
+
+  if (!newPassword) {
+    throw new AppError('New password is required', 400);
   }
 
-  const hashed = await bcrypt.hash(req.body.newPassword, 10);
+  // Validate new password strength
+  validators.validatePassword(newPassword);
 
-  await User.findByIdAndUpdate(req.user.id, { password: hashed });
+  // Prevent setting same password
+  if (currentPassword === newPassword) {
+    throw new AppError('New password must be different from current password', 400);
+  }
 
-  res.json({ success: true });
+  if (!req.user || !req.user.id) {
+    throw new AppError('User not authenticated', 401);
+  }
+
+  // Get user with password field
+  let user;
+  try {
+    user = await User.findById(req.user.id).select('+password');
+  } catch (error) {
+    console.error('User lookup error:', error);
+    throw new AppError('Failed to retrieve user', 500);
+  }
+
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
+
+  // If currentPassword is provided, verify it
+  if (currentPassword) {
+    let passwordMatch;
+    try {
+      passwordMatch = await bcrypt.compare(currentPassword, user.password);
+    } catch (error) {
+      console.error('Password comparison error:', error);
+      throw new AppError('Failed to verify current password', 500);
+    }
+
+    if (!passwordMatch) {
+      throw new AppError('Current password is incorrect', 401);
+    }
+  }
+
+  // Hash new password
+  let hashedPassword;
+  try {
+    hashedPassword = await bcrypt.hash(newPassword, 10);
+  } catch (error) {
+    console.error('Password hashing error:', error);
+    throw new AppError('Failed to process new password', 500);
+  }
+
+  // Update password
+  try {
+    await User.findByIdAndUpdate(req.user.id, { password: hashedPassword });
+  } catch (error) {
+    console.error('Password update error:', error);
+    throw new AppError('Failed to update password', 500);
+  }
+
+  res.status(200).json({
+    success: true,
+    message: 'Password changed successfully',
+  });
 });

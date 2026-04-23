@@ -9,8 +9,8 @@ export const userApi = createApi({
   endpoints: (builder) => ({
     getUsers: builder.query({
       query: () => "/users",
-      transformResponse: (res: any[]) =>
-        res.map((u) => ({
+      transformResponse: (res: any) =>
+        (res.data || []).map((u: any) => ({
           ...u,
           id: u._id,
           uid: u._id,
@@ -21,9 +21,9 @@ export const userApi = createApi({
     getProfile: builder.query({
       query: () => "/users/me",
       transformResponse: (res: any) => ({
-        ...res,
-        id: res._id,
-        uid: res._id,
+        ...res.data,
+        id: res.data._id,
+        uid: res.data._id,
       }),
     }),
     addUser: builder.mutation({

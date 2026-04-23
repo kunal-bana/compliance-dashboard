@@ -9,8 +9,8 @@ export const regulationsApi = createApi({
   endpoints: (builder) => ({
     getRegulations: builder.query({
       query: () => "/regulations",
-      transformResponse: (res: any[]) =>
-        res.map((r) => ({
+      transformResponse: (res: any) =>
+        (res.data || []).map((r: any) => ({
           ...r,
           id: r._id,
         })),

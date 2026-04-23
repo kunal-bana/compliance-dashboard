@@ -9,8 +9,8 @@ export const tasksApi = createApi({
   endpoints: (builder) => ({
     getTasks: builder.query<Task[], void>({
       query: () => "/tasks",
-      transformResponse: (res: any[]): Task[] =>
-        res.map((t) => ({
+      transformResponse: (res: any): Task[] =>
+        (res.data || []).map((t: any) => ({
           ...t,
           id: t._id,
         })),

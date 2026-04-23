@@ -1,54 +1,175 @@
-const User = require("../models/user"); 
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const asyncHandler = require("../utils/asyncHandler");
-const AppError = require("../utils/AppError");
+const User = require('../models/user');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const asyncHandler = require('../utils/asyncHandler');
+const AppError = require('../utils/AppError');
+const validators = require('../utils/validators');
 
+/**
+ * Register a new user
+ * First user becomes ADMIN, subsequent users become VIEWER
+ * @route POST /api/auth/register
+ * @param {string} email - User email
+ * @param {string} password - User password (min 6 chars)
+ */
 exports.register = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
+  // Validate input
   if (!email || !password) {
-    throw new AppError("Email & password required", 400);
+    throw new AppError('Email and password are required', 400);
   }
 
-  const exists = await User.findOne({ email });
-  if (exists) throw new AppError("User exists", 400);
+  // Validate email format
+  validators.validateEmail(email);
 
-  const hashed = await bcrypt.hash(password, 10);
+  // Validate password strength
+  validators.validatePassword(password);
 
-  const count = await User.countDocuments();
-  const role = count === 0 ? "ADMIN" : "VIEWER";
+  // Check if user already exists
+  const existingUser = await User.findOne({ email: email.toLowerCase() });
+  if (existingUser) {
+    throw new AppError('Email already registered. Please login or use a different email', 400);
+  }
 
-  const user = await User.create({ email, password: hashed, role });
+  // Hash password with bcrypt (10 rounds)
+  let hashedPassword;
+  try {
+    hashedPassword = await bcrypt.hash(password, 10);
+  } catch (error) {
+    console.error('Password hashing error:', error);
+    throw new AppError('Failed to process password', 500);
+  }
 
-  res.json({ ...user.toObject(), id: user._id });
+  // Determine role - first user is ADMIN
+  let role = 'VIEWER';
+  try {
+    const userCount = await User.countDocuments();
+    if (userCount === 0) {
+      role = 'ADMIN';
+    }
+  } catch (error) {
+    console.error('Error checking user count:', error);
+    throw new AppError('Failed to create user', 500);
+  }
+
+  // Create new user
+  let user;
+  try {
+    user = await User.create({
+      email: email.toLowerCase(),
+      password: hashedPassword,
+      role,
+    });
+  } catch (error) {
+    if (error.code === 11000) {
+      throw new AppError('Email already registered', 400);
+    }
+    if (error.name === 'ValidationError') {
+      const message = Object.values(error.errors)
+        .map(e => e.message)
+        .join(', ');
+      throw new AppError(message, 400);
+    }
+    console.error('User creation error:', error);
+    throw new AppError('Failed to create user', 500);
+  }
+
+  // Prepare response
+  const userObject = user.toObject();
+  delete userObject.password;
+
+  res.status(201).json({
+    success: true,
+    message: `User registered successfully as ${role}`,
+    data: {
+      ...userObject,
+      id: user._id,
+    },
+  });
 });
 
+/**
+ * Login user and return JWT token
+ * @route POST /api/auth/login
+ * @param {string} email - User email
+ * @param {string} password - User password
+ */
 exports.login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
+  // Validate input
   if (!email || !password) {
-    throw new AppError("Email and password required", 400);
+    throw new AppError('Email and password are required', 400);
   }
 
-  const user = await User.findOne({ email });
-  if (!user) throw new AppError("User not found", 400);
+  validators.validateEmail(email);
 
-  const match = await bcrypt.compare(password, user.password);
-  if (!match) throw new AppError("Wrong password", 400);
-
+  // Check if JWT_SECRET is configured
   if (!process.env.JWT_SECRET) {
-    throw new AppError("JWT_SECRET missing", 500);
+    console.error('JWT_SECRET is not configured');
+    throw new AppError('Server configuration error', 500);
   }
 
-  const token = jwt.sign(
-    { id: user._id, role: user.role },
-    process.env.JWT_SECRET,
-    { expiresIn: "7d" }
-  );
+  // Find user and include password field (normally excluded)
+  let user;
+  try {
+    user = await User.findOne({ email: email.toLowerCase() }).select('+password');
+  } catch (error) {
+    console.error('Database query error:', error);
+    throw new AppError('Failed to retrieve user', 500);
+  }
 
-  res.json({
-    token,
-    user: { ...user.toObject(), id: user._id },
+  if (!user) {
+    // Don't reveal if email exists for security
+    throw new AppError('Invalid email or password', 401);
+  }
+
+  // Check if user is active
+  if (!user.isActive) {
+    throw new AppError('Account has been deactivated. Contact administrator', 403);
+  }
+
+  // Verify password
+  let passwordMatch;
+  try {
+    passwordMatch = await bcrypt.compare(password, user.password);
+  } catch (error) {
+    console.error('Password comparison error:', error);
+    throw new AppError('Authentication failed', 500);
+  }
+
+  if (!passwordMatch) {
+    // Don't reveal if password is wrong for security
+    throw new AppError('Invalid email or password', 401);
+  }
+
+  // Generate JWT token
+  let token;
+  try {
+    token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    );
+  } catch (error) {
+    console.error('Token generation error:', error);
+    throw new AppError('Failed to generate authentication token', 500);
+  }
+
+  // Prepare user response
+  const userObject = user.toObject();
+  delete userObject.password;
+
+  res.status(200).json({
+    success: true,
+    message: 'Login successful',
+    data: {
+      token,
+      user: {
+        ...userObject,
+        id: user._id,
+      },
+    },
   });
 });

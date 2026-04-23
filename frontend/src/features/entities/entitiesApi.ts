@@ -9,8 +9,8 @@ export const entitiesApi = createApi({
   endpoints: (builder) => ({
     getEntities: builder.query({
       query: () => "/entities",
-      transformResponse: (res: any[]) =>
-        res.map((e) => ({
+      transformResponse: (res: any) =>
+        (res.data || []).map((e: any) => ({
           ...e,
           id: e._id,
         })),

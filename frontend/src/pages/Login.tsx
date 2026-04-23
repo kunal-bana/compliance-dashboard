@@ -46,17 +46,22 @@ export default function Login() {
 
       const data = await res.json();
 
-      localStorage.setItem("token", data.token);
+      if (!res.ok) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      localStorage.setItem("token", data.data.token);
 
       dispatch(setUser({
-        uid: data.user._id,
-        email: data.user.email,
-        role: data.user.role,
+        uid: data.data.user._id,
+        email: data.data.user.email,
+        role: data.data.user.role,
       }));
 
       navigate("/dashboard");
-    } catch {
-      setError("Login failed");
+
+    } catch (err: any) {
+      setError(err.message || "Login failed");
     } finally {
       setLoading(false);
     }
