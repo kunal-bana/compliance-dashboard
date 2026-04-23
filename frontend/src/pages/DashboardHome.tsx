@@ -319,8 +319,7 @@ export default function DashboardHome() {
     { name: "In Progress", value: enrichedTasks.filter((t: any) => t.computedStatus === "In Progress").length },
     { name: "Completed", value: enrichedTasks.filter((t: any) => t.computedStatus === "Completed").length },
     { name: "Overdue", value: enrichedTasks.filter((t: any) => t.computedStatus === "Overdue").length },
-  ];
-  const PIE_COLORS = ["#f59e0b", "#3b82f6", "#10b981", "#ef4444"];
+  ].filter(item => item.value > 0);
 
   const tooltipStyle = {
     contentStyle: {
@@ -432,45 +431,57 @@ export default function DashboardHome() {
                 <ResponsiveContainer width="100%" height={270}>
                   <PieChart>
                     <Pie
-                      data={pieData} dataKey="value"
-                      innerRadius={68} outerRadius={100}
-                      paddingAngle={3} stroke="none"
-                      style={{ outline: "none", cursor: "pointer" }}
-                      onClick={(data) => handlePieClick(data)}
-                      activeShape={{ stroke: mode === "dark" ? "#111827" : "#fff", strokeWidth: 3 } as any}
+                      data={pieData}
+                      dataKey="value"
+                      innerRadius={70}
+                      outerRadius={105}
+                      paddingAngle={3}
+                      cornerRadius={6}
+                      stroke="none"
+                    style={{ outline: "none", cursor: "pointer" }}
+                    onClick={(data) => handlePieClick(data)}
+                    activeShape={{ stroke: mode === "dark" ? "#111827" : "#fff", strokeWidth: 3 } as any}
                     >
-                      {pieData.map((_, index) => (
-                        <Cell key={index} fill={PIE_COLORS[index]} />
-                      ))}
-                    </Pie>
-                    <Legend
-                      verticalAlign="bottom" iconType="circle" iconSize={7}
-                      wrapperStyle={{ fontSize: 11.5, color: mode === "dark" ? "#64748b" : "#64748b" }}
-                    />
-                    <ReTooltip {...tooltipStyle} />
-                  </PieChart>
-                </ResponsiveContainer>
-                <Box sx={{
-                  position: "absolute", top: "48%", left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  textAlign: "center", pointerEvents: "none",
+                    {pieData.map((entry, index) => (
+                      <Cell
+                        key={index}
+                        fill={
+                          entry.name === "Pending" ? "#f59e0b" :
+                            entry.name === "In Progress" ? "#3b82f6" :
+                              entry.name === "Completed" ? "#10b981" :
+                                "#ef4444"
+                        }
+                      />
+                    ))}
+                  </Pie>
+                  <Legend
+                    verticalAlign="bottom" iconType="circle" iconSize={7}
+                    wrapperStyle={{ fontSize: 11.5, color: mode === "dark" ? "#64748b" : "#64748b" }}
+                  />
+                  <ReTooltip {...tooltipStyle} />
+                </PieChart>
+              </ResponsiveContainer>
+              <Box sx={{
+                position: "absolute", top: "48%", left: "50%",
+                transform: "translate(-50%, -50%)",
+                textAlign: "center", pointerEvents: "none",
+              }}>
+                <Typography fontWeight={800} sx={{
+                  color: "text.primary", lineHeight: 1,
+                  fontSize: "1.9rem",
+                  fontFamily: "'DM Sans', sans-serif",
                 }}>
-                  <Typography fontWeight={800} sx={{
-                    color: "text.primary", lineHeight: 1,
-                    fontSize: "1.9rem",
-                    fontFamily: "'DM Sans', sans-serif",
-                  }}>
-                    {tasks.length}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 500, fontSize: "0.72rem" }}>
-                    Total
-                  </Typography>
-                </Box>
+                  {tasks.length}
+                </Typography>
+                <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 500, fontSize: "0.72rem" }}>
+                  Total
+                </Typography>
               </Box>
-            </Paper>
-          </Grid>
+            </Box>
+          </Paper>
         </Grid>
-      </Box>
+      </Grid>
     </Box>
+    </Box >
   );
 }

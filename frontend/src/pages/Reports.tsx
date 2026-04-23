@@ -134,9 +134,13 @@ export default function Reports() {
     Overdue: filteredTasks.filter((t: any) => t.computedStatus === "Overdue").length,
   };
 
-  const pieData = Object.entries(statusSummary).map(([status, count]) => ({
-    name: status, value: count, color: statusConfig[status].chartColor,
-  }));
+  const pieData = Object.entries(statusSummary)
+    .map(([status, count]) => ({
+      name: status,
+      value: count,
+      color: statusConfig[status].chartColor,
+    }))
+    .filter((item) => item.value > 0);
 
   const lineData = useMemo(() => {
     const monthMap: Record<string, number> = {};
@@ -146,7 +150,7 @@ export default function Reports() {
       const key = `${date.getFullYear()}-${date.getMonth()}`;
       monthMap[key] = (monthMap[key] || 0) + 1;
     });
-    const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     return Object.entries(monthMap)
       .sort(([a], [b]) => {
         const [yA, mA] = a.split("-").map(Number);
@@ -189,13 +193,13 @@ export default function Reports() {
     </Box>
   );
   if (!tasks.length) {
-  return (
-    <EmptyState
-      title="No Reports Yet"
-      subtitle="Reports will appear after tasks are created"
-    />
-  );
-}
+    return (
+      <EmptyState
+        title="No Reports Yet"
+        subtitle="Reports will appear after tasks are created"
+      />
+    );
+  }
   return (
     <Box sx={{ width: "100%" }}>
       <Box sx={{ mb: 4 }}>
@@ -316,8 +320,12 @@ export default function Reports() {
             </Typography>
             <ResponsiveContainer width="100%" height={270}>
               <PieChart>
-                <Pie data={pieData} dataKey="value" nameKey="name" outerRadius={108}
-                  paddingAngle={4} stroke="none"
+                <Pie
+                  data={pieData}
+                  dataKey="value"
+                  paddingAngle={3}
+                  cornerRadius={6}
+                  stroke="none"
                   style={{ outline: "none", cursor: "pointer" }} isAnimationActive
                   onClick={(data) => handlePieClick(data)}
                   activeShape={{ stroke: isDark ? "#111827" : "#fff", strokeWidth: 3 } as any}>
