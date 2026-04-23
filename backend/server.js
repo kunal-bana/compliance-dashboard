@@ -27,8 +27,6 @@ const connectDB = async () => {
   }
 };
 
-//  MIDDLEWARE 
-// CORS Configuration
 app.use(
   cors({
     origin: process.env.CORS_ORIGINS

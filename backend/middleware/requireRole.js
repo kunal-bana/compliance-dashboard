@@ -1,12 +1,5 @@
 const AppError = require('../utils/AppError');
 
-/**
- * Role-based access control middleware
- * Validates that user has one of the required roles
- * @param {...string} roles - Allowed role names
- * @returns {Function} Express middleware
- * @throws {AppError} If user role is not authorized
- */
 module.exports = (...roles) => {
   return (req, res, next) => {
     try {

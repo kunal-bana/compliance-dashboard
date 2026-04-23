@@ -5,13 +5,6 @@ const asyncHandler = require('../utils/asyncHandler');
 const AppError = require('../utils/AppError');
 const validators = require('../utils/validators');
 
-/**
- * Register a new user
- * First user becomes ADMIN, subsequent users become VIEWER
- * @route POST /api/auth/register
- * @param {string} email - User email
- * @param {string} password - User password (min 6 chars)
- */
 exports.register = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
@@ -89,12 +82,6 @@ exports.register = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Login user and return JWT token
- * @route POST /api/auth/login
- * @param {string} email - User email
- * @param {string} password - User password
- */
 exports.login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 

@@ -3,11 +3,6 @@ const asyncHandler = require('../utils/asyncHandler');
 const AppError = require('../utils/AppError');
 const validators = require('../utils/validators');
 
-/**
- * Get all entities
- * @route GET /api/entities
- * @returns {Array} Array of all entities sorted by creation date
- */
 exports.getAll = asyncHandler(async (req, res) => {
   try {
     const entities = await Entity.find().sort({ createdAt: -1 });
@@ -37,14 +32,6 @@ exports.getAll = asyncHandler(async (req, res) => {
   }
 });
 
-/**
- * Create a new entity
- * @route POST /api/entities
- * @param {string} name - Entity name (required)
- * @param {string} type - Entity type (required)
- * @param {string} status - Entity status (optional, defaults to Active)
- * @param {string} description - Entity description (optional)
- */
 exports.create = asyncHandler(async (req, res) => {
   const { name, type, status, description } = req.body;
 
@@ -99,11 +86,6 @@ exports.create = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Update an entity
- * @route PUT /api/entities/:id
- * @param {string} id - Entity ID (required, must be valid MongoDB ObjectId)
- */
 exports.updateEntity = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -178,11 +160,6 @@ exports.updateEntity = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Delete an entity
- * @route DELETE /api/entities/:id
- * @param {string} id - Entity ID (required, must be valid MongoDB ObjectId)
- */
 exports.delete = asyncHandler(async (req, res) => {
   const { id } = req.params;
 

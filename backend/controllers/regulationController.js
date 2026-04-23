@@ -3,11 +3,6 @@ const asyncHandler = require('../utils/asyncHandler');
 const AppError = require('../utils/AppError');
 const validators = require('../utils/validators');
 
-/**
- * Get all regulations
- * @route GET /api/regulations
- * @returns {Array} Array of all regulations sorted by creation date
- */
 exports.getAll = asyncHandler(async (req, res) => {
   try {
     const regulations = await Regulation.find().sort({ createdAt: -1 });
@@ -37,15 +32,6 @@ exports.getAll = asyncHandler(async (req, res) => {
   }
 });
 
-/**
- * Create a new regulation
- * @route POST /api/regulations
- * @param {string} title - Regulation title (required)
- * @param {string} code - Regulation code (required, must be unique)
- * @param {string} status - Regulation status (optional, defaults to Active)
- * @param {string} description - Regulation description (optional)
- * @param {Date} effectiveDate - Regulation effective date (optional)
- */
 exports.create = asyncHandler(async (req, res) => {
   const { title, code, status, description, effectiveDate } = req.body;
 
@@ -116,11 +102,6 @@ exports.create = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Update a regulation
- * @route PUT /api/regulations/:id
- * @param {string} id - Regulation ID (required, must be valid MongoDB ObjectId)
- */
 exports.update = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -213,11 +194,6 @@ exports.update = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Delete a regulation
- * @route DELETE /api/regulations/:id
- * @param {string} id - Regulation ID (required, must be valid MongoDB ObjectId)
- */
 exports.delete = asyncHandler(async (req, res) => {
   const { id } = req.params;
 

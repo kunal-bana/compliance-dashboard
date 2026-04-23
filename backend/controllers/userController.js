@@ -4,11 +4,6 @@ const asyncHandler = require('../utils/asyncHandler');
 const AppError = require('../utils/AppError');
 const validators = require('../utils/validators');
 
-/**
- * Get all users (excluding password field)
- * @route GET /api/users
- * @access ADMIN, MANAGER
- */
 exports.getUsers = asyncHandler(async (req, res) => {
   try {
     const users = await User.find().select('-password').sort({ createdAt: -1 });
@@ -38,14 +33,6 @@ exports.getUsers = asyncHandler(async (req, res) => {
   }
 });
 
-/**
- * Create a new user
- * @route POST /api/users/create
- * @access ADMIN
- * @param {string} email - User email (required, unique)
- * @param {string} password - User password (required, min 6 chars)
- * @param {string} role - User role (required, must be ADMIN, MANAGER, or VIEWER)
- */
 exports.createUser = asyncHandler(async (req, res) => {
   const { email, password, role } = req.body;
 
@@ -119,13 +106,6 @@ exports.createUser = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Update user role
- * @route PUT /api/users/role/:id
- * @access ADMIN
- * @param {string} id - User ID (required, must be valid MongoDB ObjectId)
- * @param {string} role - New role (required, must be ADMIN, MANAGER, or VIEWER)
- */
 exports.updateUserRole = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { role } = req.body;
@@ -188,12 +168,6 @@ exports.updateUserRole = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Delete a user
- * @route DELETE /api/users/:id
- * @access ADMIN
- * @param {string} id - User ID (required, must be valid MongoDB ObjectId)
- */
 exports.deleteUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -251,11 +225,6 @@ exports.deleteUser = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Get current user profile
- * @route GET /api/users/me
- * @access All authenticated users
- */
 exports.getProfile = asyncHandler(async (req, res) => {
   if (!req.user || !req.user.id) {
     throw new AppError('User not authenticated', 401);
@@ -287,13 +256,6 @@ exports.getProfile = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Change password for current user
- * @route POST /api/users/change-password
- * @access All authenticated users
- * @param {string} currentPassword - Current password (optional but recommended)
- * @param {string} newPassword - New password (required, min 6 chars)
- */
 exports.changePassword = asyncHandler(async (req, res) => {
   const { currentPassword, newPassword } = req.body;
 

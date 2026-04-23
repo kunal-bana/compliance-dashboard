@@ -6,11 +6,6 @@ const asyncHandler = require('../utils/asyncHandler');
 const AppError = require('../utils/AppError');
 const validators = require('../utils/validators');
 
-/**
- * Get all tasks
- * @route GET /api/tasks
- * @returns {Array} Array of all tasks sorted by creation date
- */
 exports.getAll = asyncHandler(async (req, res) => {
   try {
     const tasks = await Task.find()
@@ -45,19 +40,6 @@ exports.getAll = asyncHandler(async (req, res) => {
   }
 });
 
-/**
- * Create a new task
- * @route POST /api/tasks
- * @param {string} title - Task title (required)
- * @param {string} description - Task description (optional)
- * @param {string} entityId - Entity ID (required, must be valid ObjectId)
- * @param {string} regulationId - Regulation ID (required, must be valid ObjectId)
- * @param {string} assignedTo - User ID to assign task (required, must be valid ObjectId)
- * @param {string} status - Task status (optional, defaults to Pending)
- * @param {string} priority - Task priority (optional, defaults to Medium)
- * @param {Date} dueDate - Task due date (required)
- * @param {string} notes - Task notes (optional)
- */
 exports.create = asyncHandler(async (req, res) => {
   const { title, description, entityId, regulationId, assignedTo, status, priority, dueDate, notes } = req.body;
 
@@ -180,11 +162,6 @@ exports.create = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Update a task
- * @route PUT /api/tasks/:id
- * @param {string} id - Task ID (required, must be valid MongoDB ObjectId)
- */
 exports.update = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -307,11 +284,6 @@ exports.update = asyncHandler(async (req, res) => {
   });
 });
 
-/**
- * Delete a task
- * @route DELETE /api/tasks/:id
- * @param {string} id - Task ID (required, must be valid MongoDB ObjectId)
- */
 exports.delete = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
