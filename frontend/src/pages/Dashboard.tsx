@@ -5,11 +5,13 @@ import Sidebar from "../components/Sidebar";
 import BreadcrumbsBar from "../components/BreadcrumbsBar";
 import { Outlet } from "react-router-dom";
 import { useThemeMode } from "../theme/ThemeContext";
+import { useLocation } from "react-router-dom";
 const HEADER_HEIGHT = 64;
 export default function Dashboard() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { mode } = useThemeMode();
-
+  const location = useLocation();
+  const isDashboardHome = location.pathname === "/dashboard";
   return (
     <Box sx={{
       height: "100vh",
@@ -36,26 +38,27 @@ export default function Dashboard() {
           overflow: "hidden",
           minWidth: 0,
         }}>
-          {/* Breadcrumbs bar */}
-          <Box sx={{
-            px: { xs: 2, sm: 3 },
-            height: 46,
-            display: "flex",
-            alignItems: "center",
-            flexShrink: 0,
-            bgcolor: "background.paper",
-            borderBottom: (theme) =>
-              `1px solid ${theme.palette.mode === "dark"
-                ? "rgba(255,255,255,0.06)"
-                : "rgba(0,0,0,0.06)"}`,
-            boxShadow: mode === "dark"
-              ? "0 1px 0 rgba(255,255,255,0.03)"
-              : "0 1px 4px rgba(0,0,0,0.04)",
-            transition: "all 0.3s ease",
-          }}>
-            <BreadcrumbsBar />
-          </Box>
-
+          {/* Breadcrumbs bar (hide on dashboard home) */}
+          {!isDashboardHome && (
+            <Box sx={{
+              px: { xs: 2, sm: 3 },
+              height: 46,
+              display: "flex",
+              alignItems: "center",
+              flexShrink: 0,
+              bgcolor: "background.paper",
+              borderBottom: (theme) =>
+                `1px solid ${theme.palette.mode === "dark"
+                  ? "rgba(255,255,255,0.06)"
+                  : "rgba(0,0,0,0.06)"}`,
+              boxShadow: mode === "dark"
+                ? "0 1px 0 rgba(255,255,255,0.03)"
+                : "0 1px 4px rgba(0,0,0,0.04)",
+              transition: "all 0.3s ease",
+            }}>
+              <BreadcrumbsBar />
+            </Box>
+          )}
           {/* Scrollable content area */}
           <Box sx={{
             flexGrow: 1,
@@ -79,7 +82,7 @@ export default function Dashboard() {
           }}>
             <Box sx={{
               width: "100%",
-              maxWidth: "100vw", 
+              maxWidth: "100vw",
               overflowX: "hidden",
               px: { xs: 2, sm: 2, md: 3, xl: 4 },
               py: { xs: 2, sm: 2 },
