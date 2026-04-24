@@ -354,7 +354,7 @@ export default function DashboardHome() {
           Dashboard Overview
         </Typography>
         <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.75, fontSize: "0.875rem" }}>
-          Welcome back — here's what's happening today.
+          Welcome back - here's what's happening today.
         </Typography>
       </Box>
 

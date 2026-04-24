@@ -156,9 +156,28 @@ export default function Tasks() {
   }
   if (isLoading) {
     return (
-      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 10 }}>
-        <CircularProgress />
-        <Typography mt={2}>Loading tasks...</Typography>
+      <Box sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        py: 12,
+        animation: "fadeIn 0.4s ease",
+      }}>
+        <CircularProgress
+          size={48}
+          sx={{
+            color: "primary.main",
+            mb: 2,
+          }}
+        />
+        <Typography sx={{
+          color: "text.secondary",
+          fontSize: "0.95rem",
+          fontWeight: 500,
+        }}>
+          Loading tasks...
+        </Typography>
       </Box>
     );
   }
@@ -187,6 +206,9 @@ export default function Tasks() {
     "& .ag-header": {
       backgroundColor: isDark ? "#0f172a" : "#f8fafc",
       borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)"}`,
+      boxShadow: isDark
+        ? "0 1px 3px rgba(0,0,0,0.12)"
+        : "0 1px 3px rgba(0,0,0,0.04)",
     },
     "& .ag-header-cell-label": {
       fontWeight: 700, fontSize: "0.72rem", textTransform: "uppercase",
@@ -194,9 +216,11 @@ export default function Tasks() {
     },
     "& .ag-row": {
       borderBottomColor: `${isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)"} !important`,
+      transition: "background-color 0.2s ease",
     },
     "& .ag-row:hover": {
-      backgroundColor: `${isDark ? "rgba(99,102,241,0.06)" : "rgba(99,102,241,0.04)"} !important`,
+      backgroundColor: `${isDark ? "rgba(99,102,241,0.08)" : "rgba(99,102,241,0.06)"} !important`,
+      boxShadow: `inset 0 0 12px ${isDark ? "rgba(99,102,241,0.08)" : "rgba(99,102,241,0.06)"}`,
     },
     "& .ag-cell": {
       display: "flex", alignItems: "center",

@@ -171,13 +171,22 @@ export default function Settings() {
     "& .ag-header": {
       backgroundColor: isDark ? "#0f172a" : "#f8fafc",
       borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)"}`,
+      boxShadow: isDark
+        ? "0 1px 3px rgba(0,0,0,0.12)"
+        : "0 1px 3px rgba(0,0,0,0.04)",
     },
     "& .ag-header-cell-label": {
       fontWeight: 700, fontSize: "0.72rem", textTransform: "uppercase",
       letterSpacing: "0.06em", color: isDark ? "#475569" : "#94a3b8",
     },
-    "& .ag-row": { borderBottomColor: `${isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)"} !important` },
-    "& .ag-row:hover": { backgroundColor: `${isDark ? "rgba(99,102,241,0.06)" : "rgba(99,102,241,0.04)"} !important` },
+    "& .ag-row": {
+      borderBottomColor: `${isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)"} !important`,
+      transition: "background-color 0.2s ease",
+    },
+    "& .ag-row:hover": {
+      backgroundColor: `${isDark ? "rgba(99,102,241,0.08)" : "rgba(99,102,241,0.06)"} !important`,
+      boxShadow: `inset 0 0 12px ${isDark ? "rgba(99,102,241,0.08)" : "rgba(99,102,241,0.06)"}`,
+    },
     "& .ag-cell": { display: "flex", alignItems: "center", color: isDark ? "#cbd5e1" : "#334155", fontSize: "0.875rem" },
     "& .ag-paging-panel": { borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)"}`, color: isDark ? "#64748b" : "#94a3b8", fontSize: "0.8rem" },
     "& .ag-body-viewport": { backgroundColor: isDark ? "#111827" : "#fff" },

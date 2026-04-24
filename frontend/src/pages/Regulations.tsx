@@ -74,10 +74,17 @@ export default function Regulations() {
         {canManage && (
           <Tooltip title="Edit" placement="left" arrow>
             <IconButton size="small" sx={{
-              color: "#6366f1", borderRadius: "8px",
-              "&:hover": { bgcolor: alpha("#6366f1", 0.1) },
-            }} onClick={() => setEditRegulation(params.data)}>
-              <EditOutlinedIcon sx={{ fontSize: 16 }} />
+              color: "#6366f1",
+              borderRadius: "10px",
+              background: "transparent",
+              transition: "all 0.2s ease",
+              "&:hover": {
+                background: alpha("#6366f1", 0.12),
+                color: "#4f46e5",
+                transform: "scale(1.1)",
+              },
+            }}>
+              <EditOutlinedIcon sx={{ fontSize: 18 }} />
             </IconButton>
           </Tooltip>
         )}
@@ -114,9 +121,28 @@ export default function Regulations() {
   }
   if (isLoading) {
     return (
-      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 10 }}>
-        <CircularProgress />
-        <Typography mt={2}>Loading regulations...</Typography>
+      <Box sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        py: 12,
+        animation: "fadeIn 0.4s ease",
+      }}>
+        <CircularProgress
+          size={48}
+          sx={{
+            color: "primary.main",
+            mb: 2,
+          }}
+        />
+        <Typography sx={{
+          color: "text.secondary",
+          fontSize: "0.95rem",
+          fontWeight: 500,
+        }}>
+          Loading regulations...
+        </Typography>
       </Box>
     );
   }
@@ -145,6 +171,9 @@ export default function Regulations() {
     "& .ag-header": {
       backgroundColor: isDark ? "#0f172a" : "#f8fafc",
       borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)"}`,
+      boxShadow: isDark
+        ? "0 1px 3px rgba(0,0,0,0.12)"
+        : "0 1px 3px rgba(0,0,0,0.04)",
     },
     "& .ag-header-cell-label": {
       fontWeight: 700, fontSize: "0.72rem", textTransform: "uppercase",
@@ -152,9 +181,11 @@ export default function Regulations() {
     },
     "& .ag-row": {
       borderBottomColor: `${isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)"} !important`,
+      transition: "background-color 0.2s ease",
     },
     "& .ag-row:hover": {
-      backgroundColor: `${isDark ? "rgba(99,102,241,0.06)" : "rgba(99,102,241,0.04)"} !important`,
+      backgroundColor: `${isDark ? "rgba(99,102,241,0.08)" : "rgba(99,102,241,0.06)"} !important`,
+      boxShadow: `inset 0 0 12px ${isDark ? "rgba(99,102,241,0.08)" : "rgba(99,102,241,0.06)"}`,
     },
     "& .ag-cell": {
       display: "flex", alignItems: "center",
