@@ -124,7 +124,10 @@ export default function Reports() {
     : enrichedTasks;
 
   const filteredTasks = selectedRegulation
-    ? roleTasks.filter((t: any) => t.regulationId === selectedRegulation)
+    ? roleTasks.filter(
+      (t: any) =>
+        String(t.regulationId?._id) === String(selectedRegulation)
+    )
     : roleTasks;
 
   const statusSummary = {
@@ -232,7 +235,9 @@ export default function Reports() {
 
         <Grid container spacing={{ xs: 2, sm: 2 }}>
           {regulations.map((reg: any) => {
-            const count = roleTasks.filter((t: any) => t.regulationId === reg.id).length;
+            const count = roleTasks.filter(
+              (t: any) => String(t.regulationId?._id) === String(reg.id)
+            ).length;
             const isSelected = selectedRegulation === reg.id;
             return (
               <Grid size={{ xs: 12, sm: 6, md: 4 }} key={reg.id}>
