@@ -52,7 +52,6 @@ function KpiCard({
         alignItems: "center",
         cursor: onClick ? "pointer" : "default",
         transition: "transform 0.2s ease, box-shadow 0.2s ease",
-        boxShadow: `0 6px 28px ${alpha(accentColor, 0.38)}`,
         position: "relative",
         overflow: "hidden",
         "&::before": {
@@ -76,7 +75,7 @@ function KpiCard({
         ...(onClick && {
           "&:hover": {
             transform: "translateY(-3px)",
-            boxShadow: `0 14px 38px ${alpha(accentColor, 0.52)}`,
+            boxShadow: `0 14px 30px ${alpha(accentColor, 0.52)}`,
           },
           "&:active": { transform: "translateY(-1px)" },
         }),

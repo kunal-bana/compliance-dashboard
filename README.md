@@ -22,7 +22,7 @@ compliance-dashboard/
 * React.js
 * TypeScript
 * Vite
-* Axios
+* RTK 
 
 ### Backend
 
@@ -49,7 +49,7 @@ compliance-dashboard/
 ### 1️⃣ Clone the repository
 
 ```
-git clone <your-repo-url>
+git clone https://github.com/kunal-bana/compliance-dashboard.git
 cd compliance-dashboard
 ```
 
