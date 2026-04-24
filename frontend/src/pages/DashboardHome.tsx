@@ -19,6 +19,7 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import { useThemeMode } from "../theme/ThemeContext";
 import EmptyState from "../components/EmptyState";
+import PieChartIcon from '@mui/icons-material/PieChart';
 function normalizeDate(value: any): Date | null {
   if (!value) return null;
   if (value?.toDate) return value.toDate();
@@ -424,9 +425,18 @@ export default function DashboardHome() {
           {/* PIE CHART */}
           <Grid size={{ xs: 12, lg: 4 }}>
             <Paper elevation={0} sx={chartCardSx}>
-              <Typography variant="subtitle1" fontWeight={700} sx={{ color: "text.primary", mb: 3, fontSize: "0.925rem" }}>
-                Task Status Distribution
-              </Typography>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.25, mb: 3 }}>
+                <Box sx={{
+                  width: 32, height: 32, borderRadius: "9px",
+                  bgcolor: alpha("#6366f1", 0.1),
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  <PieChartIcon sx={{ color: "#6366f1", fontSize: 17 }} />
+                </Box>
+                <Typography variant="subtitle1" fontWeight={700} sx={{ color: "text.primary", fontSize: "0.925rem" }}>
+                  Tasks Status Distribution
+                </Typography>
+              </Box>
               <Box sx={{ position: "relative" }}>
                 <ResponsiveContainer width="100%" height={270}>
                   <PieChart>
@@ -438,50 +448,50 @@ export default function DashboardHome() {
                       paddingAngle={3}
                       cornerRadius={6}
                       stroke="none"
-                    style={{ outline: "none", cursor: "pointer" }}
-                    onClick={(data) => handlePieClick(data)}
-                    activeShape={{ stroke: mode === "dark" ? "#111827" : "#fff", strokeWidth: 3 } as any}
+                      style={{ outline: "none", cursor: "pointer" }}
+                      onClick={(data) => handlePieClick(data)}
+                      activeShape={{ stroke: mode === "dark" ? "#111827" : "#fff", strokeWidth: 3 } as any}
                     >
-                    {pieData.map((entry, index) => (
-                      <Cell
-                        key={index}
-                        fill={
-                          entry.name === "Pending" ? "#f59e0b" :
-                            entry.name === "In Progress" ? "#3b82f6" :
-                              entry.name === "Completed" ? "#10b981" :
-                                "#ef4444"
-                        }
-                      />
-                    ))}
-                  </Pie>
-                  <Legend
-                    verticalAlign="bottom" iconType="circle" iconSize={7}
-                    wrapperStyle={{ fontSize: 11.5, color: mode === "dark" ? "#64748b" : "#64748b" }}
-                  />
-                  <ReTooltip {...tooltipStyle} />
-                </PieChart>
-              </ResponsiveContainer>
-              <Box sx={{
-                position: "absolute", top: "48%", left: "50%",
-                transform: "translate(-50%, -50%)",
-                textAlign: "center", pointerEvents: "none",
-              }}>
-                <Typography fontWeight={800} sx={{
-                  color: "text.primary", lineHeight: 1,
-                  fontSize: "1.9rem",
-                  fontFamily: "'DM Sans', sans-serif",
+                      {pieData.map((entry, index) => (
+                        <Cell
+                          key={index}
+                          fill={
+                            entry.name === "Pending" ? "#f59e0b" :
+                              entry.name === "In Progress" ? "#3b82f6" :
+                                entry.name === "Completed" ? "#10b981" :
+                                  "#ef4444"
+                          }
+                        />
+                      ))}
+                    </Pie>
+                    <Legend
+                      verticalAlign="bottom" iconType="circle" iconSize={7}
+                      wrapperStyle={{ fontSize: 11.5, color: mode === "dark" ? "#64748b" : "#64748b" }}
+                    />
+                    <ReTooltip {...tooltipStyle} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <Box sx={{
+                  position: "absolute", top: "48%", left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  textAlign: "center", pointerEvents: "none",
                 }}>
-                  {tasks.length}
-                </Typography>
-                <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 500, fontSize: "0.72rem" }}>
-                  Total
-                </Typography>
+                  <Typography fontWeight={800} sx={{
+                    color: "text.primary", lineHeight: 1,
+                    fontSize: "1.9rem",
+                    fontFamily: "'DM Sans', sans-serif",
+                  }}>
+                    {tasks.length}
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 500, fontSize: "0.72rem" }}>
+                    Total
+                  </Typography>
+                </Box>
               </Box>
-            </Box>
-          </Paper>
+            </Paper>
+          </Grid>
         </Grid>
-      </Grid>
-    </Box>
+      </Box>
     </Box >
   );
 }
