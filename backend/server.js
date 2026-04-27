@@ -1,3 +1,4 @@
+process.removeAllListeners('warning');
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -162,13 +163,26 @@ const swaggerOptions = {
   apis: ['./routes/*.js'],
 };
 
-const swaggerSpec = swaggerJsdoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-  customCss: '.swagger-ui .topbar { display: none }',
-  swaggerOptions: {
-    persistAuthorization: true,
-  },
-}));
+let swaggerSpec;
+
+try {
+  swaggerSpec = swaggerJsdoc(swaggerOptions);
+} catch (err) {
+  console.error('Swagger generation failed:', err.message);
+}
+
+if (swaggerSpec) {
+  app.use(
+    '/api-docs',
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerSpec, {
+      customCss: '.swagger-ui .topbar { display: none }',
+      swaggerOptions: {
+        persistAuthorization: true,
+      },
+    })
+  );
+}
 
 //  ROUTES 
 app.use('/api/auth', require('./routes/authRoutes'));

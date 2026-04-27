@@ -132,7 +132,6 @@ export default function DashboardHome() {
   const currentUserId = useSelector((state: RootState) => state.auth.uid);
   const navigate = useNavigate();
   const { mode } = useThemeMode();
-
   const { data: entities = [], isLoading: eLoading } = useGetEntitiesQuery(undefined);
   const { data: regulations = [], isLoading: rLoading } = useGetRegulationsQuery(undefined);
   const { data: tasks = [], isLoading: tLoading } = useGetTasksQuery(undefined);
@@ -191,7 +190,14 @@ export default function DashboardHome() {
   const activeTasks = enrichedTasks.filter(
     (t: any) => t.computedStatus === "Pending" || t.computedStatus === "In Progress"
   ).length;
-  const myTasks = enrichedTasks.filter((t: any) => t.assignedTo === currentUserId);
+  const myTasks = enrichedTasks.filter((t: any) => {
+    const assignedId =
+      typeof t.assignedTo === "object"
+        ? t.assignedTo?._id
+        : t.assignedTo;
+
+    return assignedId === currentUserId;
+  });
   const myCompletedTasks = myTasks.filter((t: any) => t.computedStatus === "Completed").length;
   const myOverdueTasks = myTasks.filter((t: any) => t.computedStatus === "Overdue").length;
 
@@ -286,7 +292,7 @@ export default function DashboardHome() {
         icon: <WarningAmberIcon fontSize="inherit" />,
         gradient: "linear-gradient(135deg, #ee0979 0%, #ff6a00 100%)",
         accentColor: "#ee0979",
-        onClick: () => goToTasks({ assignedTo: currentUserId, status: "Overdue" }),
+        onClick: () => goToTasks({ assignedTo: currentUserId, overdue: true }),
       },
     ];
   }

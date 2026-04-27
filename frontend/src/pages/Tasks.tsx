@@ -45,15 +45,16 @@ export default function Tasks() {
   const { data: tasks = [], isLoading, isError, refetch } = useGetTasksQuery(undefined);
   const { data: entities = [] } = useGetEntitiesQuery(undefined);
   const { data: regulations = [] } = useGetRegulationsQuery(undefined);
-  const { data: users = [] } = useGetUsersQuery(undefined);
+  const { data: users = [] } = useGetUsersQuery(undefined, {
+    skip: role !== "ADMIN" && role !== "MANAGER",
+  });
 
   const [addOpen, setAddOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
-
+  const currentUserId = useSelector((state: RootState) => state.auth.uid);
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
   const handleClearAll = () => {
     setSearchText(""); setStatusFilter("All");
     if (Object.keys(filterFromState).length > 0) {
@@ -66,21 +67,39 @@ export default function Tasks() {
 
   const filteredTasks = useMemo(() => {
     return tasks.filter((task: Task) => {
+
       if (searchText && !task.title.toLowerCase().includes(searchText.toLowerCase())) return false;
+
       if (statusFilter !== "All") {
-        if (statusFilter === "Overdue") { if (!isTaskOverdue(task)) return false; }
-        else { if (task.status !== statusFilter) return false; }
+        if (statusFilter === "Overdue") {
+          if (!isTaskOverdue(task)) return false;
+        } else {
+          if (task.status !== statusFilter) return false;
+        }
       }
+
       if (
         filterFromState.assignedTo &&
         task.assignedTo?._id !== filterFromState.assignedTo
       ) return false;
-      if (filterFromState.overdue) { if (!isTaskOverdue(task)) return false; }
-      if (filterFromState.active) { if (task.status === "Completed" || isTaskOverdue(task)) return false; }
-      if (filterFromState.status && task.status !== filterFromState.status) return false;
+
+      if (filterFromState.overdue && !isTaskOverdue(task)) return false;
+
+      if (filterFromState.active) {
+        if (task.status === "Completed" || isTaskOverdue(task)) return false;
+      }
+
+      if (filterFromState.status) {
+        if (filterFromState.status === "Overdue") {
+          if (!isTaskOverdue(task)) return false;
+        } else {
+          if (task.status !== filterFromState.status) return false;
+        }
+      }
+
       return true;
     });
-  }, [tasks, searchText, statusFilter, filterFromState]);
+  }, [tasks, searchText, statusFilter, filterFromState, role, currentUserId]);
 
   const entityMap = useMemo(() => Object.fromEntries(entities.map((e: any) => [e.id, e.name])), [entities]);
   const regulationMap = useMemo(() => Object.fromEntries(regulations.map((r: any) => [r.id, r.title])), [regulations]);

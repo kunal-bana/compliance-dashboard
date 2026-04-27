@@ -5,23 +5,24 @@ const Regulation = require('../models/regulation');
 const asyncHandler = require('../utils/asyncHandler');
 const AppError = require('../utils/AppError');
 const validators = require('../utils/validators');
+const mongoose = require("mongoose");
 
 exports.getAll = asyncHandler(async (req, res) => {
   try {
-    const tasks = await Task.find()
+    const user = req.user;
+
+    let query = {};
+
+    if (user.role === "VIEWER") {
+      query.assignedTo = new mongoose.Types.ObjectId(user.id);
+    }
+
+    const tasks = await Task.find(query)
       .populate('assignedTo', 'email role')
       .populate('createdBy', 'email role')
       .populate('entityId', 'name type')
       .populate('regulationId', 'title code')
       .sort({ createdAt: -1 });
-
-    if (!tasks || tasks.length === 0) {
-      return res.status(200).json({
-        success: true,
-        message: 'No tasks found',
-        data: [],
-      });
-    }
 
     const formatted = tasks.map((t) => ({
       ...t.toObject(),
@@ -34,6 +35,7 @@ exports.getAll = asyncHandler(async (req, res) => {
       data: formatted,
       count: formatted.length,
     });
+
   } catch (error) {
     console.error('Database error in getAll:', error);
     throw new AppError('Failed to retrieve tasks', 500);
@@ -44,7 +46,7 @@ exports.create = asyncHandler(async (req, res) => {
   const { title, description, entityId, regulationId, assignedTo, status, priority, dueDate, notes } = req.body;
 
   // Validate required fields
-  validators.validateRequired({ title, entityId, regulationId, assignedTo, dueDate }, 
+  validators.validateRequired({ title, entityId, regulationId, assignedTo, dueDate },
     ['title', 'entityId', 'regulationId', 'assignedTo', 'dueDate']);
 
   // Validate title

@@ -41,7 +41,9 @@ export default function Settings() {
   const [roleFilter, setRoleFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
   const gridApiRef = useRef<GridApi | null>(null);
-  const { data: users = [] } = useGetUsersQuery(undefined);
+  const { data: users } = useGetUsersQuery(undefined, {
+    skip: role === "VIEWER",
+  });
   const currentUser = useSelector((state: RootState) => state.auth);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -211,7 +213,7 @@ export default function Settings() {
       </Typography>
     </Box>
   );
-  if (!users.length && role === "ADMIN") {
+  if (role === "ADMIN" && (!users || users.length === 0)) {
     return (
       <EmptyState
         title="No Users Found"
@@ -389,7 +391,7 @@ export default function Settings() {
 
           <Box className={isDark ? "ag-theme-alpine-dark" : "ag-theme-alpine"} sx={gridSx}>
             <AgGridReact
-              rowData={users} columnDefs={columns} domLayout="autoHeight" theme="legacy"
+              rowData={users || []} columnDefs={columns} domLayout="autoHeight" theme="legacy"
               onGridReady={onGridReady}
               isExternalFilterPresent={isExternalFilterPresent}
               doesExternalFilterPass={doesExternalFilterPass}

@@ -16,6 +16,8 @@ import {
   BarChartOutlined,
   SettingsOutlined,
 } from "@mui/icons-material";
+import { useSelector } from "react-redux";
+import type { RootState } from "../app/store";
 import WestIcon from '@mui/icons-material/West';
 import EastIcon from '@mui/icons-material/East';
 const drawerWidth = 240;
@@ -40,7 +42,7 @@ export default function Sidebar({
   const navigate = useNavigate();
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
-
+  const role = useSelector((state: RootState) => state.auth.role);
   const content = (isDesktop: boolean) => (
     <Box
       sx={{
@@ -51,60 +53,65 @@ export default function Sidebar({
       }}
     >
       <List sx={{ px: 1.5 }}>
-        {menu.map((item) => {
-          const active = location.pathname === item.path;
+        {menu
+          .filter((item) => {
+            if (role === "VIEWER" && item.label === "Reports") return false;
+            return true;
+          })
+          .map((item) => {
+            const active = location.pathname === item.path;
 
-          return (
-            <ListItemButton
-              key={item.path}
-              selected={active}
-              onClick={() => {
-                navigate(item.path);
-                if (!isDesktop) onClose();
-              }}
-              sx={{
-                borderRadius: 1,
-                mb: 0.5,
-                px: 2,
-                minHeight: 48,
-                justifyContent:
-                  isDesktop && isCollapsed ? "center" : "initial",
-                "&.Mui-selected": {
-                  bgcolor: "primary.lighter",
-                  color: "primary.main",
-                  "& .MuiListItemIcon-root": {
-                    color: "primary.main",
-                  },
-                },
-              }}
-            >
-              <ListItemIcon
+            return (
+              <ListItemButton
+                key={item.path}
+                selected={active}
+                onClick={() => {
+                  navigate(item.path);
+                  if (!isDesktop) onClose();
+                }}
                 sx={{
-                  minWidth: isDesktop && isCollapsed ? 0 : 40,
-                  mr: isDesktop && isCollapsed ? 0 : 0,
-                  color: active ? "inherit" : "text.secondary",
-                  justifyContent: "center",
+                  borderRadius: 1,
+                  mb: 0.5,
+                  px: 2,
+                  minHeight: 48,
+                  justifyContent:
+                    isDesktop && isCollapsed ? "center" : "initial",
+                  "&.Mui-selected": {
+                    bgcolor: "primary.lighter",
+                    color: "primary.main",
+                    "& .MuiListItemIcon-root": {
+                      color: "primary.main",
+                    },
+                  },
                 }}
               >
-                {item.icon}
-              </ListItemIcon>
+                <ListItemIcon
+                  sx={{
+                    minWidth: isDesktop && isCollapsed ? 0 : 40,
+                    mr: isDesktop && isCollapsed ? 0 : 0,
+                    color: active ? "inherit" : "text.secondary",
+                    justifyContent: "center",
+                  }}
+                >
+                  {item.icon}
+                </ListItemIcon>
 
-              <ListItemText
-                primary={item.label}
-                primaryTypographyProps={{
-                  fontSize: "0.875rem",
-                  fontWeight: active ? 600 : 500,
-                  noWrap: true,
-                }}
-                sx={{
-                  opacity: isDesktop && isCollapsed ? 0 : 1,
-                  transition: "opacity 0.2s ease",
-                  display: isDesktop && isCollapsed ? "none" : "block",
-                }}
-              />
-            </ListItemButton>
-          );
-        })}
+                <ListItemText
+                  primary={item.label}
+                  primaryTypographyProps={{
+                    fontSize: "0.875rem",
+                    fontWeight: active ? 600 : 500,
+                    noWrap: true,
+                  }}
+                  sx={{
+                    opacity: isDesktop && isCollapsed ? 0 : 1,
+                    transition: "opacity 0.2s ease",
+                    display: isDesktop && isCollapsed ? "none" : "block",
+                  }}
+                />
+              </ListItemButton>
+            );
+          })}
       </List>
     </Box>
   );

@@ -62,7 +62,9 @@ export default function AddTaskDialog({ open, onClose }: Props) {
 
   const { data: entities = [] } = useGetEntitiesQuery(undefined);
   const { data: regulations = [] } = useGetRegulationsQuery(undefined);
-  const { data: users = [] } = useGetUsersQuery(undefined);
+  const { data: users } = useGetUsersQuery(undefined, {
+    skip: role !== "ADMIN" && role !== "MANAGER",
+  });
 
   return (
     <Dialog
